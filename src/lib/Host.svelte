@@ -1,0 +1,3 @@
+<script>
+    WebSocket()
+</script>
