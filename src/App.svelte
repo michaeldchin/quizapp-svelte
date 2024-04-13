@@ -1,24 +1,19 @@
 <script>
-  import logo from './assets/triviaapp-mc.png'
-  import Counter from './lib/Counter.svelte'
   import Host from './lib/Host.svelte'
+  import MainMenu from './lib/MainMenu.svelte';
+  import Player from './lib/Player.svelte';
+  import * as Constants from './lib/Constants';
   let gameState = ''
 </script>
 
 <main>
   
   {#if gameState === ''}
-    <div>
-      <img src={logo} class="logo" alt="Logo" />
-    </div>
-
-    <div class="card">
-    <button on:click={() => gameState = 'host'}>
-      Host a new game
-    </button>
-  </div>
-  {:else if gameState === 'host'}
+    <MainMenu bind:gameState={gameState}/>
+  {:else if gameState === Constants.HOST}
     <Host />
+  {:else if gameState === Constants.PLAYER}
+    <Player />
   {/if}
 </main>
 
