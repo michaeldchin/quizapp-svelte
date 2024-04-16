@@ -14,8 +14,11 @@ class Roles {
 wss.on('connection', (ws, req) => {
 
   logConnectionInfo(req)
-  // Host has started game or player/viewer joins
+  // Host has started game or player/viewer joins+
   const { role, gameId, playerId } = handleGameConnect(ws, req)
+  if (role === null) { // early exit
+    ws.close() 
+  }
 
   ws.on('error', (err) => {
     console.error(err)
@@ -48,10 +51,18 @@ const handleGameConnect = (ws, req) => {
   const queryParams = queryString.parse(req.url.replace(/^.*\?/, ''))
   if (queryParams.player === Roles.HOST) {
     // host starting new game
-    const newGameId = Controller.newGame(ws)
-    const strReponse = JSON.stringify({role: Roles.HOST, event: 'newGame', gameId: newGameId})
-    ws.send(strReponse)
-    return {role: Roles.HOST, gameId: newGameId}
+    try {
+      const newGameId = Controller.newGame(ws)
+      const strReponse = JSON.stringify({role: Roles.HOST, event: 'newGame', gameId: newGameId})
+      ws.send(strReponse)
+      return {role: Roles.HOST, gameId: newGameId}
+    }
+    catch (e) {
+      if (e instanceof ValidationError) {
+        return {role: null}
+      }
+      else throw e
+    }
   }
   if (queryParams.player === Roles.PLAYER) {
     const playerId = Controller.playerJoin(queryParams.gameId, ws)
@@ -62,12 +73,23 @@ const handleGameConnect = (ws, req) => {
   }
 }
 
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 class Controller {
 
   static games = new Map()
 
   static newGame(ws) {
     const gameId = 'aaaa' //todo: change to rng
+    if (this.games.has(gameId)) {
+      ws.send('Game already exists')
+      throw new ValidationError(`Cannot create new game. gameId: ${gameId} already exists`)
+    }
     this.games.set(gameId, new Game(gameId, ws))
     
     return gameId
@@ -78,7 +100,7 @@ class Controller {
   }
   static closeGame(gameId) {
     if (!this.games.has(gameId)) {
-      return
+      throw new Error(`Cannot close game. gameId: ${gameId} does not exist`)
     }
     this.games.get(gameId).players.forEach(p => {
       p.ws.send(JSON.stringify({event: 'hostLeftGameClose'}))
@@ -88,7 +110,7 @@ class Controller {
 
   static playerJoin(gameId, ws) {
     if (!this.games.has(gameId)) {
-
+      throw new Error(`playerJoin() called with gameId: ${gameId} that does not exist.`) 
     }
     const game = this.games.get(gameId)
     const newPlayer = new Player('SomeDude', ws)
@@ -99,7 +121,7 @@ class Controller {
 
   static removePlayer(gameId, playerId) {
     if (!this.games.has(gameId)) {
-      return
+      throw new Error(`removePlayer() called with gameId: ${gameId} that does not exist.`)
     }
     this.getGame(gameId).removePlayer(playerId)
   }
