@@ -12,14 +12,34 @@
   <img src={logo} class="logo" alt="Logo" />
 </div>
 
-<div class="card">
-  <button on:click={hostGame}> Host a new game </button>
+<div class="menu">
+  <button class="menu-items join-game" on:click={joinGame}> Join a game </button>
+  <button class="menu-items join-game" on:click={viewGame}> View a game </button>
+  <button class="menu-items join-game" on:click={hostGame}> Host a new game </button>  
 </div>
 
-<div class="card">
-  <button on:click={joinGame}> Join a game </button>
-</div>
 
-<div class="card">
-  <button on:click={viewGame}> View a game </button>
-</div>
+<style>
+  .menu {
+    padding: .5em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .menu-items {
+    border-color: black;
+    margin: .5em;
+  }
+  .join-game {
+    border-color: black;
+    width: 100%;
+  }
+  .secondary-buttons {
+    margin-top: .5em;
+    width: 45%;
+  }
+
+  .logo {
+    width: 100%;
+  }
+</style>
