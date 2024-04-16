@@ -6,21 +6,26 @@
   const ws = new WebSocket(`ws://localhost:8080/?player=host&gameId=${gameId}`);
 
   export let response = null
+  let players = []
   ws.onmessage = msg => {
-    console.log(msg)
-    response = msg.data
-
-    // handle players joining your game
-    // handle 
+    const resp = JSON.parse(msg.data)
+    if (resp.event === 'newGame') {
+      response = 'GAME ID: ' + resp.gameId
+    }
+    if (resp.event === 'playerJoin') {
+      players = resp.players
+    }
     
   }
-  // localStorage.setItem('gameId', 'aaab')
 </script>
 
 <main>
-  <p>stuuff</p>
-  <p>{response}</p>
-  <p class="waitingPlayers"></p>
+  <p class="waitingPlayers" >Waiting for players to join...</p>
+  <p class="waitingPlayers" >{response}</p>
+  <p>Players: </p>
+  {#each players as p}
+    <div>{p}</div>
+  {/each}
 </main>
 
 <style>
