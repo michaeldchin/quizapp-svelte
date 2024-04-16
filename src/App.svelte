@@ -3,6 +3,7 @@
   import MainMenu from './lib/MainMenu.svelte';
   import Player from './lib/Player.svelte';
   import * as Constants from './lib/Constants';
+    import Viewer from './lib/Viewer.svelte';
   let gameState = ''
 </script>
 
@@ -14,6 +15,8 @@
     <Host />
   {:else if gameState === Constants.PLAYER}
     <Player />
+  {:else if gameState === Constants.VIEWER}
+    <Viewer />
   {/if}
 </main>
 

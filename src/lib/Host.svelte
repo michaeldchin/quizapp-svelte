@@ -9,6 +9,9 @@
   ws.onmessage = msg => {
     console.log(msg)
     response = msg.data
+
+    // handle players joining your game
+    // handle 
     
   }
   // localStorage.setItem('gameId', 'aaab')
@@ -17,4 +20,11 @@
 <main>
   <p>stuuff</p>
   <p>{response}</p>
+  <p class="waitingPlayers"></p>
 </main>
+
+<style>
+  .waitingPlayers {
+    font-size: 1em;
+  }
+</style>
