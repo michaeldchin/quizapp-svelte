@@ -47,6 +47,7 @@ const logConnectionInfo = (req) => {
   console.log(`New connection ${ip} connections: ${wss.clients.size} with gameId: ${queryParams.gameId}`)
 }
 
+
 const handleGameConnect = (ws, req) => {
   const queryParams = queryString.parse(req.url.replace(/^.*\?/, ''))
   if (queryParams.player === Roles.HOST) {
@@ -121,13 +122,10 @@ class Controller {
 
   static removePlayer(gameId, playerId) {
     if (!this.games.has(gameId)) {
-      throw new Error(`removePlayer() called with gameId: ${gameId} that does not exist.`)
+      console.warn(`removePlayer() called with gameId: ${gameId} that does not exist.`)
+      return
     }
     this.getGame(gameId).removePlayer(playerId)
-  }
-
-  static listPlayers(input) {
-    return this.games.get(input).listPlayers()
   }
 }
 
@@ -155,14 +153,22 @@ class Game {
     this.updatePlayers()
   }
 
+
+  /**
+   * Returns array of player names
+   */
   updatePlayers() {
-    // state + players
     this.players.forEach((p) => {
       const strResponse = JSON.stringify({event: 'playerJoin', players: this.listPlayers()})
+      this.hostConnection.send(strResponse)
       p.ws.send(strResponse)
     })
   }
 
+  /**
+   * Returns array of player names
+   * @returns {Array<string>}
+   */
   listPlayers() {
     return Array.from(this.players, ([key, value]) => value.name);
   }
