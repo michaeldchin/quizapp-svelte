@@ -11,6 +11,9 @@
       if (resp.event === 'playerJoin') {
         fellowPlayers = resp.players
       }
+      if (resp.event === 'hostLeftGameClose') {
+        state = 'hostLeftGameClose'
+      }
     }
   }
 
@@ -30,6 +33,10 @@
     {#each fellowPlayers as player}
       <div class="waitingPlayers">{player}</div>
     {/each}
+  </div>
+
+  <div id="gameClosedByHost" hidden={state !== 'hostLeftGameClose'}>
+    <p>Game ended by host, refresh to get back to main menu</p>
   </div>
 </main>
 
