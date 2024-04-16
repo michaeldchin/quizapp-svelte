@@ -17,7 +17,9 @@
 </script>
 <main>
   <div id="join-prompt" hidden={state !== 'prompt'}>
-    <input bind:value={gameId} placeholder="Enter game ID" />
+    <div class="input-container">
+      <input bind:value={gameId} placeholder="Enter game ID" />
+    </div>
     <button disabled={!gameId} on:click={connectToGame}>Join Game</button>
     <p class="input-warning"></p>
   </div>
@@ -32,6 +34,15 @@
 </main>
 
 <style>
+  input {
+    height: 2rem;
+    width: 75%;
+    font-size: 2rem;
+    text-align: center;
+  }
+  .input-container {
+    padding: 1rem;
+  }
   .waitingPlayers {
     font-size: 2em;
   }

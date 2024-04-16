@@ -1,5 +1,7 @@
 import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
+import { v4 as uuidv4 } from 'uuid';
+ 
 const wss = new WebSocketServer({ port: 8080 });
 
 class Roles {
@@ -13,11 +15,11 @@ wss.on('connection', (ws, req) => {
 
   logConnectionInfo(req)
   // Host has started game or player/viewer joins
-  const {role, gameId, playerName } = handleGameConnect(ws, req)
+  const { role, gameId, playerId } = handleGameConnect(ws, req)
 
-  
-
-  ws.on('error', console.error);
+  ws.on('error', (err) => {
+    console.error(err)
+  });
   ws.on('message', (message) => {
     // const controllerResponse = Controller.handle(JSON.parse(message))
     // console.log(controllerResponse)
@@ -28,8 +30,8 @@ wss.on('connection', (ws, req) => {
     if (role === Roles.HOST) {
       Controller.closeGame(gameId)
     }
-    if (role === Roles.Player) {
-      Controller.removePlayer(gameId, playerName)
+    if (role === Roles.PLAYER) {
+      Controller.removePlayer(gameId, playerId)
     }    
     console.log('closed')
   })
@@ -52,8 +54,8 @@ const handleGameConnect = (ws, req) => {
     return {role: Roles.HOST, gameId: newGameId}
   }
   if (queryParams.player === Roles.PLAYER) {
-    const playerName = Controller.playerJoin(queryParams.gameId, ws)
-    return {role: Roles.PLAYER, gameId: queryParams.gameId, playerName}
+    const playerId = Controller.playerJoin(queryParams.gameId, ws)
+    return {role: Roles.PLAYER, gameId: queryParams.gameId, playerId}
   }
   if (queryParams.player === Roles.VIEWER) {
     return {role: Roles.VIEWER, gameId: queryParams.gameId}
@@ -75,6 +77,9 @@ class Controller {
     return this.games.get(gameId)
   }
   static closeGame(gameId) {
+    if (!this.games.has(gameId)) {
+      return
+    }
     this.games.get(gameId).players.forEach(p => {
       p.ws.send(JSON.stringify({event: 'hostLeftGameClose'}))
     })
@@ -82,13 +87,21 @@ class Controller {
   }
 
   static playerJoin(gameId, ws) {
-    this.games.get(gameId).addPlayer('SomeDude', ws)
+    if (!this.games.has(gameId)) {
+
+    }
+    const game = this.games.get(gameId)
+    const newPlayer = new Player('SomeDude', ws)
+    game.addPlayer(newPlayer)
     // update all players that this player has joined game
-    return 'SomeDude'
+    return newPlayer.id
   }
 
-  static removePlayer(gameId, playerName) {
-    getGame(gameId).removePlayer(playerName)
+  static removePlayer(gameId, playerId) {
+    if (!this.games.has(gameId)) {
+      return
+    }
+    this.getGame(gameId).removePlayer(playerId)
   }
 
   static listPlayers(input) {
@@ -102,19 +115,21 @@ class Game {
     this.gameId = gameId
     this.players = new Map()
   }
-  
-  addPlayer(playerName, ws) {
-    if (!this.players.has(playerName)) {
-      this.players.set(playerName, new Player(playerName, ws))
-      this.updatePlayers()
+
+  addPlayer(player) {
+    const playerAlreadyExists = this.players.has(player.id)
+    if (playerAlreadyExists) {
+      return false
     }
-    else {
-      // already exists
+    if (!playerAlreadyExists) {
+      this.players.set(player.id, player)
+      this.updatePlayers()
+      return true
     }
   }
 
-  removePlayer(playerName) {
-    this.players.delete(playerName)
+  removePlayer(playerId) {
+    this.players.delete(playerId)
     this.updatePlayers()
   }
 
@@ -133,11 +148,8 @@ class Game {
 
 class Player {
   constructor(name, ws) {
+    this.id = uuidv4()
     this.name = name
     this.ws = ws //websocket connection
-  }
-
-  getName() {
-    return this.name
   }
 }

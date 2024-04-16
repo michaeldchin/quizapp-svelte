@@ -27,11 +27,9 @@
     justify-content: space-between;
   }
   .menu-items {
-    border-color: black;
     margin: .5em;
   }
   .join-game {
-    border-color: black;
     width: 100%;
   }
   .secondary-buttons {
