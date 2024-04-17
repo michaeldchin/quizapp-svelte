@@ -14,7 +14,6 @@ class Roles {
 wss.on('connection', (ws, req) => {
 
   logConnectionInfo(req)
-  // Host has started game or player/viewer joins+
   const { role, gameId, playerId } = handleGameConnect(ws, req)
   if (role === null) { // early exit
     ws.close() 
@@ -24,9 +23,11 @@ wss.on('connection', (ws, req) => {
     console.error(err)
   });
   ws.on('message', (message) => {
-    // const controllerResponse = Controller.handle(JSON.parse(message))
-    // console.log(controllerResponse)
-    // ws.send(controllerResponse)
+    
+    console.log(JSON.parse(message)) 
+    // TODO: broadcast to players, game has started
+    // Initialize whatever game state
+    
   })
 
   ws.on('close', () => {
@@ -99,11 +100,12 @@ class Controller {
   static getGame(gameId) {
     return this.games.get(gameId)
   }
+
   static closeGame(gameId) {
     if (!this.games.has(gameId)) {
       throw new Error(`Cannot close game. gameId: ${gameId} does not exist`)
     }
-    this.games.get(gameId).players.forEach(p => {
+    this.getGame(gameId).players.forEach(p => {
       p.ws.send(JSON.stringify({event: 'hostLeftGameClose'}))
     })
     this.games.delete(gameId)
@@ -113,7 +115,7 @@ class Controller {
     if (!this.games.has(gameId)) {
       throw new Error(`playerJoin() called with gameId: ${gameId} that does not exist.`) 
     }
-    const game = this.games.get(gameId)
+    const game = this.getGame(gameId)
     const newPlayer = new Player('SomeDude', ws)
     game.addPlayer(newPlayer)
     // update all players that this player has joined game
@@ -154,9 +156,6 @@ class Game {
   }
 
 
-  /**
-   * Returns array of player names
-   */
   updatePlayers() {
     this.players.forEach((p) => {
       const strResponse = JSON.stringify({event: 'playerJoin', players: this.listPlayers()})
