@@ -6,7 +6,6 @@
   const ws = new WebSocket(`ws://localhost:8080/?player=host`); //&gameId=${gameId}
 
   let gameState = 'waiting'
-
   export let response = null
   let players = []
   ws.onmessage = msg => {
@@ -18,7 +17,11 @@
     if (resp.event === 'playerJoin') {
       players = resp.players
     }
-    
+  }
+
+  ws.onerror = err => {
+    gameState = 'errorWithGameServer'
+    console.error('Error with gameserver: ', err)
   }
 
   const startGame = () => {
@@ -43,10 +46,18 @@
   <div hidden={gameState !== 'hostStartedGame'}>
     Game started
   </div>
+
+  <div hidden={gameState !== 'errorWithGameServer'}>
+    <h1 class="errorState">ERROR</h1>
+    <h3 class="errorState">Gameserver not available</h3>
+  </div>
 </main>
 
 <style>
   .waitingPlayers {
     font-size: 1em;
+  }
+  .errorState {
+    color: red;
   }
 </style>

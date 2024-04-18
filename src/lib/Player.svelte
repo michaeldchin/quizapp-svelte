@@ -14,6 +14,9 @@
       if (resp.event === 'hostLeftGameClose') {
         state = 'hostLeftGameClose'
       }
+      if (resp.event === 'hostStartedGame') {
+        state = 'hostStartedGame'
+      }
     }
   }
 
@@ -37,6 +40,10 @@
 
   <div id="gameClosedByHost" hidden={state !== 'hostLeftGameClose'}>
     <p>Game ended by host, refresh to get back to main menu</p>
+  </div>
+
+  <div id="hostStartedGame" hidden={state !== 'hostStartedGame'}>
+    <p>Game Started</p>
   </div>
 </main>
 

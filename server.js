@@ -10,6 +10,20 @@ class Roles {
   static VIEWER = 'viewer'
 }
 
+class Event {
+  static newGame(newGameId) {
+    return JSON.stringify({role: Roles.HOST, event: 'newGame', gameId: newGameId})
+  }
+  static gameAlreadyExists() {
+    return 'Game already exists'
+  }
+  static hostLeft() {
+    return JSON.stringify({event: 'hostLeftGameClose'})
+  }
+  static playerJoin(playerList) {
+    return JSON.stringify({event: 'playerJoin', players: playerList})
+  }
+}
 
 wss.on('connection', (ws, req) => {
 
@@ -55,8 +69,7 @@ const handleGameConnect = (ws, req) => {
     // host starting new game
     try {
       const newGameId = Controller.newGame(ws)
-      const strReponse = JSON.stringify({role: Roles.HOST, event: 'newGame', gameId: newGameId})
-      ws.send(strReponse)
+      ws.send(Event.newGame(newGameId))
       return {role: Roles.HOST, gameId: newGameId}
     }
     catch (e) {
@@ -89,7 +102,7 @@ class Controller {
   static newGame(ws) {
     const gameId = 'aaaa' //todo: change to rng
     if (this.games.has(gameId)) {
-      ws.send('Game already exists')
+      ws.send(Event.gameAlreadyExists())
       throw new ValidationError(`Cannot create new game. gameId: ${gameId} already exists`)
     }
     this.games.set(gameId, new Game(gameId, ws))
@@ -106,7 +119,7 @@ class Controller {
       throw new Error(`Cannot close game. gameId: ${gameId} does not exist`)
     }
     this.getGame(gameId).players.forEach(p => {
-      p.ws.send(JSON.stringify({event: 'hostLeftGameClose'}))
+      p.ws.send(Event.hostLeft())
     })
     this.games.delete(gameId)
   }
@@ -158,7 +171,7 @@ class Game {
 
   updatePlayers() {
     this.players.forEach((p) => {
-      const strResponse = JSON.stringify({event: 'playerJoin', players: this.listPlayers()})
+      const strResponse = Event.playerJoin(this.listPlayers())
       this.hostConnection.send(strResponse)
       p.ws.send(strResponse)
     })
