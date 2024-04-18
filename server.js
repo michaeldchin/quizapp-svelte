@@ -23,6 +23,9 @@ class Event {
   static playerJoin(playerList) {
     return JSON.stringify({event: 'playerJoin', players: playerList})
   }
+  static hostStartedGame() {
+    return JSON.stringify({event: 'hostStartedGame'})
+  }
 }
 
 wss.on('connection', (ws, req) => {
@@ -37,9 +40,8 @@ wss.on('connection', (ws, req) => {
     console.error(err)
   });
   ws.on('message', (message) => {
-    
     console.log(JSON.parse(message)) 
-    // TODO: broadcast to players, game has started
+    Controller.startGame(gameId)
     // Initialize whatever game state
     
   })
@@ -142,6 +144,13 @@ class Controller {
     }
     this.getGame(gameId).removePlayer(playerId)
   }
+
+  static startGame(gameId) {
+    if (!this.games.has(gameId)) {
+      throw new Error(`Cannot start game. gameId: ${gameId} does not exist`)
+    }
+    this.getGame(gameId).updatePlayersOnly(Event.hostStartedGame())
+  }
 }
 
 class Game {
@@ -174,6 +183,13 @@ class Game {
       const strResponse = Event.playerJoin(this.listPlayers())
       this.hostConnection.send(strResponse)
       p.ws.send(strResponse)
+    })
+  }
+
+  updatePlayersOnly(event) {
+    this.players.forEach((p) => {
+      // this.hostConnection.send(event)
+      p.ws.send(event)
     })
   }
 
