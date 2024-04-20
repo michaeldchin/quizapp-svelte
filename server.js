@@ -179,9 +179,9 @@ class Game {
 
 
   updatePlayers() {
+    const strResponse = Event.playerJoin(this.listPlayers())
+    this.hostConnection.send(strResponse)
     this.players.forEach((p) => {
-      const strResponse = Event.playerJoin(this.listPlayers())
-      this.hostConnection.send(strResponse)
       p.ws.send(strResponse)
     })
   }
