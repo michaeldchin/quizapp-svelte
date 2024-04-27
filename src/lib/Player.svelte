@@ -1,7 +1,7 @@
 <script>
   let gameId = 'aaaa'
   let fellowPlayers = []
-  let state = 'prompt'
+  let state = 'questionMultipleChoice'
   const connectToGame = () => {
     const ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
     ws.onmessage = (msg) => {
@@ -19,8 +19,11 @@
       }
     }
   }
-
+  const selectChoice = (choice) => {
+    document
+  }
 </script>
+
 <main>
   <div id="join-prompt" hidden={state !== 'prompt'}>
     <div class="input-container">
@@ -43,7 +46,14 @@
   </div>
 
   <div id="hostStartedGame" hidden={state !== 'hostStartedGame'}>
-    <p>Game Started</p>
+    <p>Game started. Waiting for host to send question</p>
+  </div>
+
+  <div id="questionMultipleChoice" hidden={state !== 'questionMultipleChoice'}>
+    <button id="a" on:click={() => selectChoice('a')}>A</button>
+    <button id="b" on:click={() => selectChoice('b')}>B</button>
+    <button id="c" on:click={() => selectChoice('c')}>C</button>
+    <button id="d" on:click={() => selectChoice('d')}>D</button>
   </div>
 </main>
 
@@ -59,5 +69,8 @@
   }
   .waitingPlayers {
     font-size: 2em;
+  }
+  .selectedChoice {
+    background-color: gainsboro;
   }
 </style>

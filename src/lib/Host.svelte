@@ -5,7 +5,7 @@
   }
   const ws = new WebSocket(`ws://localhost:8080/?player=host`); //&gameId=${gameId}
 
-  let gameState = 'waiting'
+  let gameState = 'hostStartedGame'
   export let response = null
   let players = []
   ws.onmessage = msg => {
@@ -44,7 +44,9 @@
   </div>
 
   <div hidden={gameState !== 'hostStartedGame'}>
-    Game started
+    <h2>Choose question type</h2>
+    <button>Multiple Choice</button>
+    <button>Open Ended</button>
   </div>
 
   <div hidden={gameState !== 'errorWithGameServer'}>
