@@ -6,14 +6,16 @@
     hostStartedGame: 'hostStartedGame',
     questionMultipleChoice: 'questionMultipleChoice',
     hostEndedQuestion: 'hostEndedQuestion',
-}
+  }
+  const baseURL = import.meta.env.VITE_BASEURL
+
   let gameId = 'aaaa'
   let fellowPlayers = []
   let answer = ''
   let state = PLAYERSTATE.prompt
   let ws = undefined;
   const connectToGame = () => {
-    ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
+    ws = new WebSocket(`${baseURL}/?player=player&gameId=${gameId}`);
     ws.onmessage = (msg) => {
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)

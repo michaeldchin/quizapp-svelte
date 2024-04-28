@@ -3,3 +3,7 @@
 
 ## Backend
 `npm run debug-backend`
+
+# Building
+
+`npm run build`

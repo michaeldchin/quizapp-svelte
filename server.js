@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
 import { v4 as uuidv4 } from 'uuid';
  
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 8081 });
 
 class Roles {
   static HOST = 'host'

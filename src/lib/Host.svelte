@@ -11,7 +11,8 @@
   if (gameId == null) {
 
   }
-  const ws = new WebSocket(`ws://localhost:8080/?player=host`); //&gameId=${gameId}
+  const baseURL = import.meta.env.VITE_BASEURL
+  const ws = new WebSocket(`${baseURL}/?player=host`); //&gameId=${gameId}
 
   let gameState = HOSTSTATE.waiting
   export let response = null
