@@ -4,6 +4,7 @@
     waiting: 'waiting',
     errorWithGameServer: 'errorWithGameServer',
     hostStartedGame: 'hostStartedGame',
+    questionSentWaitingForPlayers: 'questionSentWaitingForPlayers',
   }
 
   let gameId = localStorage.getItem("gameId");
@@ -35,6 +36,11 @@
     gameState = HOSTSTATE.hostStartedGame
     ws.send(JSON.stringify({event: gameState, gameId}))
   }
+
+  const sendQuestion = (questionType) => {
+    gameState = HOSTSTATE.questionSentWaitingForPlayers
+    ws.send(JSON.stringify({event: gameState, gameId, questionType}))
+  }
 </script>
 
 <main>
@@ -52,8 +58,13 @@
 
   <div hidden={gameState !== HOSTSTATE.hostStartedGame}>
     <h2>Choose question type</h2>
-    <button>Multiple Choice</button>
-    <button>Open Ended</button>
+    <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
+    <!-- <button>Open Ended</button> -->
+  </div>
+
+  <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
+    <h2>questionSentWaitingForPlayers</h2>
+     <!-- status of players responses -->
   </div>
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>

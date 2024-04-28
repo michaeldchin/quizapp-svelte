@@ -26,6 +26,9 @@ class Event {
   static hostStartedGame() {
     return JSON.stringify({event: 'hostStartedGame'})
   }
+  static questionMultipleChoice() {
+    return JSON.stringify({event: 'questionMultipleChoice'})
+  }
 }
 
 wss.on('connection', (ws, req) => {
@@ -41,7 +44,21 @@ wss.on('connection', (ws, req) => {
   });
   ws.on('message', (message) => {
     console.log(JSON.parse(message)) 
-    Controller.startGame(gameId)
+    const resp = JSON.parse(message)
+    if (resp.gameId !== gameId) throw new Error(`GameId from client: ${resp.gameId} did not match ${gameId}`)
+
+    if (resp.event === 'hostStartedGame') {
+      Controller.startGame(gameId)
+    }
+    if (resp.event === 'questionSentWaitingForPlayers') {
+      if (resp.questionType === 'multipleChoice') {
+        // tell players to bring up multiple choice dialog
+        Controller.getGame(gameId).updatePlayersOnly(Event.questionMultipleChoice())
+      }
+      else {
+        throw new Error(`not implemented ${resp.questionType}`)
+      }
+    }
     // Initialize whatever game state
     
   })
@@ -198,7 +215,7 @@ class Game {
    * @returns {Array<string>}
    */
   listPlayers() {
-    return Array.from(this.players, ([key, value]) => value.name);
+    return Array.from(this.players, ([, value]) => value.name);
   }
 }
 

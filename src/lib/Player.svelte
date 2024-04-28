@@ -8,13 +8,14 @@
 }
   let gameId = 'aaaa'
   let fellowPlayers = []
+  let choice = ''
   let state = PLAYERSTATE.prompt
   const connectToGame = () => {
     const ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
     ws.onmessage = (msg) => {
-      console.log(msg)
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
+      console.log(resp)
       if (resp.event === 'playerJoin') {
         fellowPlayers = resp.players
       }
@@ -24,10 +25,14 @@
       if (resp.event === PLAYERSTATE.hostStartedGame) {
         state = PLAYERSTATE.hostStartedGame
       }
+      if (resp.event === PLAYERSTATE.questionMultipleChoice) {
+        state = PLAYERSTATE.questionMultipleChoice
+      }
     }
   }
-  const selectChoice = (choice) => {
-    document
+  const selectChoice = (c) => {
+    console.log(c)
+    choice = c
   }
 </script>
 
@@ -57,10 +62,11 @@
   </div>
 
   <div id="questionMultipleChoice" hidden={state !== PLAYERSTATE.questionMultipleChoice}>
-    <button id="a" on:click={() => selectChoice('a')}>A</button>
-    <button id="b" on:click={() => selectChoice('b')}>B</button>
-    <button id="c" on:click={() => selectChoice('c')}>C</button>
-    <button id="d" on:click={() => selectChoice('d')}>D</button>
+    {#each ['a','b','c','d'] as option}
+      <button id={option} 
+              class:selectedChoice="{option === choice}" 
+              on:click={() => selectChoice({option})}>{option}</button>
+    {/each}
   </div>
 </main>
 
@@ -79,5 +85,6 @@
   }
   .selectedChoice {
     background-color: gainsboro;
+    border-color: red;
   }
 </style>
