@@ -4,10 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { createServer } from 'https'
 import { readFileSync } from 'fs';
 
-const ENV = process.argv[2]
-
-const CERTPATH = ENV === 'production' ? '/etc/letsencrypt/live/trivia.micool.dev/fullchain.pem' :  './.cert/cert.pem'
-const CERTKEYPATH = ENV === 'production' ? '/etc/letsencrypt/live/trivia.micool.dev/privkey.pem' : './.cert/key.pem'
+const CERTPATH = './.cert/cert.pem'
+const CERTKEYPATH = './.cert/key.pem'
 
 const server = createServer({
   cert: readFileSync(CERTPATH),
