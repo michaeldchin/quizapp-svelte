@@ -1,8 +1,20 @@
 import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
 import { v4 as uuidv4 } from 'uuid';
- 
-const wss = new WebSocketServer({ port: 8081 });
+import { createServer } from 'https'
+import { readFileSync } from 'fs';
+
+const ENV = process.argv[2]
+
+const CERTPATH = ENV === 'production' ? '/etc/letsencrypt/live/trivia.micool.dev/fullchain.pem' :  './.cert/cert.pem'
+const CERTKEYPATH = ENV === 'production' ? '/etc/letsencrypt/live/trivia.micool.dev/privkey.pem' : './.cert/key.pem'
+
+const server = createServer({
+  cert: readFileSync(CERTPATH),
+  key: readFileSync(CERTKEYPATH)
+})
+const PORT = 8081
+const wss = new WebSocketServer({ server });
 
 class Roles {
   static HOST = 'host'
@@ -93,6 +105,8 @@ wss.on('connection', (ws, req) => {
   })
 
 })
+
+server.listen(PORT);
 
 const logConnectionInfo = (req) => {
   const ip = req.socket.remoteAddress;

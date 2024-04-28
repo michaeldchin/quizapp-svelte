@@ -33,7 +33,7 @@
 
   ws.onerror = err => {
     gameState = HOSTSTATE.errorWithGameServer
-    console.error('Error with gameserver: ', err)
+    console.error('Error with connecting to gameserver: ', err)
   }
 
   const startGame = () => {
@@ -76,7 +76,7 @@
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>
     <h1 class="errorState">ERROR</h1>
-    <h3 class="errorState">Gameserver not available</h3>
+    <h3 class="errorState">Unable to connect to gameserver</h3>
   </div>
 </main>
 
