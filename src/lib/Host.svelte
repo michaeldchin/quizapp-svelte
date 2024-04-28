@@ -1,16 +1,23 @@
 <script>
+  const HOSTSTATE = {
+    newGame: 'newGame',
+    waiting: 'waiting',
+    errorWithGameServer: 'errorWithGameServer',
+    hostStartedGame: 'hostStartedGame',
+  }
+
   let gameId = localStorage.getItem("gameId");
   if (gameId == null) {
 
   }
   const ws = new WebSocket(`ws://localhost:8080/?player=host`); //&gameId=${gameId}
 
-  let gameState = 'hostStartedGame'
+  let gameState = HOSTSTATE.waiting
   export let response = null
   let players = []
   ws.onmessage = msg => {
     const resp = JSON.parse(msg.data)
-    if (resp.event === 'newGame') {
+    if (resp.event === HOSTSTATE.newGame) {
       response = 'GAME ID: ' + resp.gameId
       gameId = resp.gameId
     }
@@ -20,12 +27,12 @@
   }
 
   ws.onerror = err => {
-    gameState = 'errorWithGameServer'
+    gameState = HOSTSTATE.errorWithGameServer
     console.error('Error with gameserver: ', err)
   }
 
   const startGame = () => {
-    gameState = 'hostStartedGame'
+    gameState = HOSTSTATE.hostStartedGame
     ws.send(JSON.stringify({event: gameState, gameId}))
   }
 </script>
@@ -43,13 +50,13 @@
     </div>
   </div>
 
-  <div hidden={gameState !== 'hostStartedGame'}>
+  <div hidden={gameState !== HOSTSTATE.hostStartedGame}>
     <h2>Choose question type</h2>
     <button>Multiple Choice</button>
     <button>Open Ended</button>
   </div>
 
-  <div hidden={gameState !== 'errorWithGameServer'}>
+  <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>
     <h1 class="errorState">ERROR</h1>
     <h3 class="errorState">Gameserver not available</h3>
   </div>

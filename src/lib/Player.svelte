@@ -1,21 +1,28 @@
 <script>
+ const PLAYERSTATE = {
+    prompt: 'prompt',
+    waiting: 'waiting',
+    hostLeftGameClose: 'hostLeftGameClose',
+    hostStartedGame: 'hostStartedGame',
+    questionMultipleChoice: 'questionMultipleChoice',
+}
   let gameId = 'aaaa'
   let fellowPlayers = []
-  let state = 'questionMultipleChoice'
+  let state = PLAYERSTATE.prompt
   const connectToGame = () => {
     const ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
     ws.onmessage = (msg) => {
       console.log(msg)
-      state = 'waiting'
+      state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
       if (resp.event === 'playerJoin') {
         fellowPlayers = resp.players
       }
-      if (resp.event === 'hostLeftGameClose') {
-        state = 'hostLeftGameClose'
+      if (resp.event === PLAYERSTATE.hostLeftGameClose) {
+        state = PLAYERSTATE.hostLeftGameClose
       }
-      if (resp.event === 'hostStartedGame') {
-        state = 'hostStartedGame'
+      if (resp.event === PLAYERSTATE.hostStartedGame) {
+        state = PLAYERSTATE.hostStartedGame
       }
     }
   }
@@ -41,15 +48,15 @@
     {/each}
   </div>
 
-  <div id="gameClosedByHost" hidden={state !== 'hostLeftGameClose'}>
+  <div id="gameClosedByHost" hidden={state !== PLAYERSTATE.hostLeftGameClose}>
     <p>Game ended by host, refresh to get back to main menu</p>
   </div>
 
-  <div id="hostStartedGame" hidden={state !== 'hostStartedGame'}>
+  <div id="hostStartedGame" hidden={state !== PLAYERSTATE.hostStartedGame}>
     <p>Game started. Waiting for host to send question</p>
   </div>
 
-  <div id="questionMultipleChoice" hidden={state !== 'questionMultipleChoice'}>
+  <div id="questionMultipleChoice" hidden={state !== PLAYERSTATE.questionMultipleChoice}>
     <button id="a" on:click={() => selectChoice('a')}>A</button>
     <button id="b" on:click={() => selectChoice('b')}>B</button>
     <button id="c" on:click={() => selectChoice('c')}>C</button>
