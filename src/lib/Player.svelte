@@ -5,13 +5,15 @@
     hostLeftGameClose: 'hostLeftGameClose',
     hostStartedGame: 'hostStartedGame',
     questionMultipleChoice: 'questionMultipleChoice',
+    hostEndedQuestion: 'hostEndedQuestion',
 }
   let gameId = 'aaaa'
   let fellowPlayers = []
-  let choice = ''
+  let answer = ''
   let state = PLAYERSTATE.prompt
+  let ws = undefined;
   const connectToGame = () => {
-    const ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
+    ws = new WebSocket(`ws://localhost:8080/?player=player&gameId=${gameId}`);
     ws.onmessage = (msg) => {
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
@@ -28,10 +30,16 @@
       if (resp.event === PLAYERSTATE.questionMultipleChoice) {
         state = PLAYERSTATE.questionMultipleChoice
       }
+
+      if (resp.event === PLAYERSTATE.hostEndedQuestion) {
+        state = PLAYERSTATE.hostEndedQuestion
+      }
     }
   }
+
   const selectChoice = (c) => {
-    choice = c
+    answer = c
+    ws.send(JSON.stringify({event: 'playerAnswer', gameId, answer}))
   }
 </script>
 
@@ -63,7 +71,7 @@
   <div id="questionMultipleChoice" hidden={state !== PLAYERSTATE.questionMultipleChoice}>
     {#each ['A','B','C','D'] as option}
       <button id={option} 
-              class:selectedChoice="{option === choice}"
+              class:selectedChoice="{option === answer}"
               class="choices"
               on:click={() => selectChoice(option)}>{option}</button>
     {/each}

@@ -25,6 +25,9 @@
     if (resp.event === 'playerJoin') {
       players = resp.players
     }
+    if (resp.event === 'playerAnswersUpdate') {
+      players = resp.players 
+    }
   }
 
   ws.onerror = err => {
@@ -65,6 +68,9 @@
   <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
     <h2>questionSentWaitingForPlayers</h2>
      <!-- status of players responses -->
+     {#each players as player}
+      <li>{player.name} {player.score} {player.answer} </li>
+     {/each}
   </div>
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>

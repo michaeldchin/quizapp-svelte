@@ -29,6 +29,9 @@ class Event {
   static questionMultipleChoice() {
     return JSON.stringify({event: 'questionMultipleChoice'})
   }
+  static playerAnswersUpdate(players) {
+    return JSON.stringify({event: 'playerAnswersUpdate', players})
+  }
 }
 
 wss.on('connection', (ws, req) => {
@@ -42,26 +45,42 @@ wss.on('connection', (ws, req) => {
   ws.on('error', (err) => {
     console.error(err)
   });
-  ws.on('message', (message) => {
-    console.log(JSON.parse(message)) 
-    const resp = JSON.parse(message)
-    if (resp.gameId !== gameId) throw new Error(`GameId from client: ${resp.gameId} did not match ${gameId}`)
 
-    if (resp.event === 'hostStartedGame') {
-      Controller.startGame(gameId)
-    }
-    if (resp.event === 'questionSentWaitingForPlayers') {
-      if (resp.questionType === 'multipleChoice') {
-        // tell players to bring up multiple choice dialog
-        Controller.getGame(gameId).updatePlayersOnly(Event.questionMultipleChoice())
+
+  // Host Events
+  if (role === Roles.HOST) {
+    ws.on('message', (message) => {
+      console.log(JSON.parse(message))
+      const resp = JSON.parse(message)
+      if (resp.event === 'hostStartedGame') {
+        Controller.startGame(gameId)
       }
-      else {
-        throw new Error(`not implemented ${resp.questionType}`)
+      if (resp.event === 'questionSentWaitingForPlayers') {
+        if (resp.questionType === 'multipleChoice') {
+          // tell players to bring up multiple choice dialog
+          Controller.getGame(gameId).updatePlayersOnly(Event.questionMultipleChoice())
+        }
+        else {
+          throw new Error(`not implemented ${resp.questionType}`)
+        }
       }
-    }
-    // Initialize whatever game state
-    
-  })
+    })
+  }
+
+  // Player Events
+  if (role === Roles.PLAYER) {
+    ws.on('message', (message) => {
+      console.log(JSON.parse(message)) 
+      const resp = JSON.parse(message)
+      if (resp.event === 'playerAnswer') {
+        // player updated answer
+        const game = Controller.getGame(gameId);
+        const player = game.getPlayer(playerId)
+        player.answer = resp.answer
+        game.updateHostOnly(Event.playerAnswersUpdate(game.listPlayersFull()))
+      }
+    })
+  }
 
   ws.on('close', () => {
     if (role === Roles.HOST) {
@@ -194,6 +213,10 @@ class Game {
     this.updatePlayers()
   }
 
+  getPlayer(playerId) {
+    return this.players.get(playerId)
+  }
+
 
   updatePlayers() {
     const strResponse = Event.playerJoin(this.listPlayers())
@@ -210,6 +233,10 @@ class Game {
     })
   }
 
+  updateHostOnly(event) {
+    this.hostConnection.send(event)
+  }
+
   /**
    * Returns array of player names
    * @returns {Array<string>}
@@ -217,12 +244,28 @@ class Game {
   listPlayers() {
     return Array.from(this.players, ([, value]) => value.name);
   }
+
+  listPlayersFull() {
+    return Array.from(this.players, ([, p]) => p.toJson());
+  }
 }
 
 class Player {
+  answer = undefined
+
   constructor(name, ws) {
     this.id = uuidv4()
     this.name = name
     this.ws = ws //websocket connection
+    this.score = 0
+  }
+
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      score: this.score,
+      answer: this.answer,
+    }
   }
 }
