@@ -31,7 +31,6 @@
     }
   }
   const selectChoice = (c) => {
-    console.log(c)
     choice = c
   }
 </script>
@@ -62,10 +61,11 @@
   </div>
 
   <div id="questionMultipleChoice" hidden={state !== PLAYERSTATE.questionMultipleChoice}>
-    {#each ['a','b','c','d'] as option}
+    {#each ['A','B','C','D'] as option}
       <button id={option} 
-              class:selectedChoice="{option === choice}" 
-              on:click={() => selectChoice({option})}>{option}</button>
+              class:selectedChoice="{option === choice}"
+              class="choices"
+              on:click={() => selectChoice(option)}>{option}</button>
     {/each}
   </div>
 </main>
@@ -84,7 +84,10 @@
     font-size: 2em;
   }
   .selectedChoice {
-    background-color: gainsboro;
-    border-color: red;
+    background-color: cornflowerblue;
+  }
+  .choices {
+    font-size: 2rem;
+    margin: 4px ;
   }
 </style>
