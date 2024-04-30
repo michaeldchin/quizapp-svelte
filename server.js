@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
 import { v4 as uuidv4 } from 'uuid';
-// import { createServer } from 'https'
+import { createServer } from 'http'
 // import { readFileSync } from 'fs';
 
 // const CERTPATH = './.cert/cert.pem'
@@ -11,8 +11,12 @@ import { v4 as uuidv4 } from 'uuid';
 //   cert: readFileSync(CERTPATH),
 //   key: readFileSync(CERTKEYPATH)
 // })
+const server = createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Hello World\n');
+})
 const PORT = 8081
-const wss = new WebSocketServer({ port: PORT });
+const wss = new WebSocketServer({ server });
 
 class Roles {
   static HOST = 'host'
@@ -104,7 +108,7 @@ wss.on('connection', (ws, req) => {
 
 })
 
-// server.listen(PORT);
+server.listen(PORT);
 
 const logConnectionInfo = (req) => {
   const ip = req.socket.remoteAddress;
