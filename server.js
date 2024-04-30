@@ -1,18 +1,18 @@
 import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
 import { v4 as uuidv4 } from 'uuid';
-import { createServer } from 'https'
-import { readFileSync } from 'fs';
+// import { createServer } from 'https'
+// import { readFileSync } from 'fs';
 
-const CERTPATH = './.cert/cert.pem'
-const CERTKEYPATH = './.cert/key.pem'
+// const CERTPATH = './.cert/cert.pem'
+// const CERTKEYPATH = './.cert/key.pem'
 
-const server = createServer({
-  cert: readFileSync(CERTPATH),
-  key: readFileSync(CERTKEYPATH)
-})
+// const server = createServer({
+//   cert: readFileSync(CERTPATH),
+//   key: readFileSync(CERTKEYPATH)
+// })
 const PORT = 8081
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ port: PORT });
 
 class Roles {
   static HOST = 'host'
