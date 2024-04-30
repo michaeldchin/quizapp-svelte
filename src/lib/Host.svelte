@@ -51,6 +51,7 @@
   <div hidden={gameState !== 'waiting'}>
     <p class="waitingPlayers" >Waiting for players to join...</p>
     <p class="waitingPlayers" >{response}</p>
+    <h2 class="error" hidden={response}>No response from server</h2>
     <p>Players: </p>
     {#each players as p}
       <div>{p}</div>
