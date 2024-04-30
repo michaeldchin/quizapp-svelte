@@ -104,7 +104,7 @@ wss.on('connection', (ws, req) => {
 
 })
 
-server.listen(PORT);
+// server.listen(PORT);
 
 const logConnectionInfo = (req) => {
   const ip = req.socket.remoteAddress;
