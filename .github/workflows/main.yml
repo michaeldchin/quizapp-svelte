@@ -25,5 +25,5 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "dist"  # Adjust to your build directory
+        source: "dist/*"  # Adjust to your build directory
         target: "/var/www/quizapp"  # Adjust to your server destination
