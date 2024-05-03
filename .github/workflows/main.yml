@@ -27,3 +27,4 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "dist/*"  # Adjust to your build directory
         target: "/var/www/quizapp"  # Adjust to your server destination
+        strip_components: 1
