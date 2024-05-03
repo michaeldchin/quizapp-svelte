@@ -18,7 +18,7 @@ jobs:
         npm install
         npm run build
 
-    - name: Copy files to server
+    - name: Copy web files to server
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
@@ -28,3 +28,16 @@ jobs:
         source: "dist/*"  # Adjust to your build directory
         target: "/var/www/quizapp"  # Adjust to your server destination
         strip_components: 1
+
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          cd /home/debian/src/quizapp-svelte
+          git pull
+          npm install --omit=dev
+          sudo systemctl restart triviaapp-backend.service
