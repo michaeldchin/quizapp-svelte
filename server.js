@@ -42,6 +42,9 @@ class Event {
   static playerAnswersUpdate(players) {
     return JSON.stringify({event: 'playerAnswersUpdate', players})
   }
+  static hostEndedQuestion() {
+    return JSON.stringify({event: 'hostEndedQuestion'})
+  }
 }
 
 wss.on('connection', (ws, req) => {
@@ -73,6 +76,10 @@ wss.on('connection', (ws, req) => {
         else {
           throw new Error(`not implemented ${resp.questionType}`)
         }
+      }
+      if (resp.event === 'hostEndedQuestion') {
+        const game = Controller.getGame(gameId)
+        game.updatePlayersOnly(Event.hostEndedQuestion())
       }
     })
   }

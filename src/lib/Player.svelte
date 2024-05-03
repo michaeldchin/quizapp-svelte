@@ -78,6 +78,11 @@
               on:click={() => selectChoice(option)}>{option}</button>
     {/each}
   </div>
+
+  <div id="hostEndedQuestion" hidden={state !== PLAYERSTATE.hostEndedQuestion}>
+    <h2>Your Answer</h2>
+    <h3>{answer}</h3>
+  </div>
 </main>
 
 <style>

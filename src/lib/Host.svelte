@@ -5,6 +5,8 @@
     errorWithGameServer: 'errorWithGameServer',
     hostStartedGame: 'hostStartedGame',
     questionSentWaitingForPlayers: 'questionSentWaitingForPlayers',
+    hostEndedQuestion: 'hostEndedQuestion',
+
   }
 
   let gameId = localStorage.getItem("gameId");
@@ -45,6 +47,11 @@
     gameState = HOSTSTATE.questionSentWaitingForPlayers
     ws.send(JSON.stringify({event: gameState, gameId, questionType}))
   }
+
+  const endQuestion = () => {
+    gameState = HOSTSTATE.hostEndedQuestion
+    ws.send(JSON.stringify({event: gameState, gameId}))
+  }
 </script>
 
 <main>
@@ -68,11 +75,19 @@
   </div>
 
   <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
-    <h2>questionSentWaitingForPlayers</h2>
+    <h2>Waiting for player responses</h2>
      <!-- status of players responses -->
      {#each players as player}
       <li>{player.name} {player.score} {player.answer} </li>
      {/each}
+     <button on:click={endQuestion}>End Question</button>
+  </div>
+
+  <div hidden={gameState !== HOSTSTATE.hostEndedQuestion}>
+    <h2>Player answers</h2>
+    {#each players as player}
+    <h3>{player.name}: {player.answer}</h3>
+   {/each}
   </div>
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>
