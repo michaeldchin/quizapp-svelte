@@ -76,18 +76,20 @@
 
   <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
     <h2>Waiting for player responses</h2>
-     <!-- status of players responses -->
-     {#each players as player}
-      <li>{player.name} {player.score} {player.answer} </li>
-     {/each}
-     <button on:click={endQuestion}>End Question</button>
+    <!-- status of players responses -->
+    {#each players as player}
+      <h3>{player.name} {player.score} {player.answer} </h3>
+    {/each}
+    <button on:click={endQuestion}>End Question</button>
   </div>
 
   <div hidden={gameState !== HOSTSTATE.hostEndedQuestion}>
     <h2>Player answers</h2>
     {#each players as player}
-    <h3>{player.name}: {player.answer}</h3>
-   {/each}
+      <h3>{player.name}: {player.answer}</h3>
+    {/each}
+    <h3>Next Question</h3>
+    <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
   </div>
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>

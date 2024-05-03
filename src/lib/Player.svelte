@@ -30,6 +30,7 @@
         state = PLAYERSTATE.hostStartedGame
       }
       if (resp.event === PLAYERSTATE.questionMultipleChoice) {
+        answer = '' // new question
         state = PLAYERSTATE.questionMultipleChoice
       }
 
