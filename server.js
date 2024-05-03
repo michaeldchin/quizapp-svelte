@@ -39,6 +39,12 @@ class Event {
   static questionMultipleChoice() {
     return JSON.stringify({event: 'questionMultipleChoice'})
   }
+  static questionTrueFalse() {
+    return JSON.stringify({event: 'questionTrueFalse'})
+  }
+  static questionOpenEnded() {
+    return JSON.stringify({event: 'questionOpenEnded'})
+  }
   static playerAnswersUpdate(players) {
     return JSON.stringify({event: 'playerAnswersUpdate', players})
   }
@@ -70,8 +76,13 @@ wss.on('connection', (ws, req) => {
       }
       if (resp.event === 'questionSentWaitingForPlayers') {
         if (resp.questionType === 'multipleChoice') {
-          // tell players to bring up multiple choice dialog
           Controller.getGame(gameId).updatePlayersOnly(Event.questionMultipleChoice())
+        }
+        else if (resp.questionType === 'trueFalse') {
+          Controller.getGame(gameId).updatePlayersOnly(Event.questionTrueFalse())
+        }
+        else if (resp.questionType === 'openEnded') {
+          Controller.getGame(gameId).updatePlayersOnly(Event.questionOpenEnded())
         }
         else {
           throw new Error(`not implemented ${resp.questionType}`)

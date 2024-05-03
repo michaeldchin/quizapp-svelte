@@ -71,6 +71,8 @@
   <div hidden={gameState !== HOSTSTATE.hostStartedGame}>
     <h2>Choose question type</h2>
     <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
+    <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
+    <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
     <!-- <button>Open Ended</button> -->
   </div>
 
@@ -90,6 +92,8 @@
     {/each}
     <h3>Next Question</h3>
     <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
+    <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
+    <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
   </div>
 
   <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>

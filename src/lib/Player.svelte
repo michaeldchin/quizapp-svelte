@@ -5,6 +5,8 @@
     hostLeftGameClose: 'hostLeftGameClose',
     hostStartedGame: 'hostStartedGame',
     questionMultipleChoice: 'questionMultipleChoice',
+    questionTrueFalse: 'questionTrueFalse',
+    questionOpenEnded: 'questionOpenEnded',
     hostEndedQuestion: 'hostEndedQuestion',
   }
   const baseURL = import.meta.env.VITE_BASEURL
@@ -33,12 +35,29 @@
         answer = '' // new question
         state = PLAYERSTATE.questionMultipleChoice
       }
+      if (resp.event === PLAYERSTATE.questionTrueFalse) {
+        answer = '' // new question
+        state = PLAYERSTATE.questionTrueFalse
+      }
+      if (resp.event === PLAYERSTATE.questionOpenEnded) {
+        answer = '' // new question
+        state = PLAYERSTATE.questionOpenEnded
+      }
 
       if (resp.event === PLAYERSTATE.hostEndedQuestion) {
         state = PLAYERSTATE.hostEndedQuestion
       }
     }
   }
+
+  //resend answer mainly to handle openended
+  let oldAnswer = '';
+  setInterval(() => {
+    if (oldAnswer != answer) {
+      oldAnswer = answer
+      ws.send(JSON.stringify({event: 'playerAnswer', gameId, answer}))
+    }
+  },1000)
 
   const selectChoice = (c) => {
     answer = c
@@ -78,6 +97,19 @@
               class="choices"
               on:click={() => selectChoice(option)}>{option}</button>
     {/each}
+  </div>
+
+  <div id="questionTrueFalse" hidden={state !== PLAYERSTATE.questionTrueFalse}>
+    {#each ['True','False'] as option}
+      <button id={option} 
+              class:selectedChoice="{option === answer}"
+              class="choices"
+              on:click={() => selectChoice(option)}>{option}</button>
+    {/each}
+  </div>
+
+  <div id="questionOpenEnded" hidden={state !== PLAYERSTATE.questionOpenEnded}>
+    <input bind:value={answer} placeholder="Enter Answer" />
   </div>
 
   <div id="hostEndedQuestion" hidden={state !== PLAYERSTATE.hostEndedQuestion}>
