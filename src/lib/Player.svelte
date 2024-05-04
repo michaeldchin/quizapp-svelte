@@ -78,7 +78,7 @@
     <p>Waiting for game to start</p>
     <p>Fellow players:</p>
     {#each fellowPlayers as player}
-      <div class="waitingPlayers">{player}</div>
+      <div class="waitingPlayers">{player.name}</div>
     {/each}
   </div>
 

@@ -9,10 +9,7 @@
 
   }
 
-  let gameId = localStorage.getItem("gameId");
-  if (gameId == null) {
-
-  }
+  let gameId
   const baseURL = import.meta.env.VITE_BASEURL
   const ws = new WebSocket(`${baseURL}/?player=host`); //&gameId=${gameId}
 
@@ -27,6 +24,7 @@
     }
     if (resp.event === 'playerJoin') {
       players = resp.players
+      console.log(resp)
     }
     if (resp.event === 'playerAnswersUpdate') {
       players = resp.players 
@@ -56,12 +54,12 @@
 
 <main>
   <div hidden={gameState !== 'waiting'}>
-    <p class="waitingPlayers" >Waiting for players to join...</p>
+    <h2 class="waitingPlayers" >Waiting for players to join...</h2>
     <p class="waitingPlayers" >{response}</p>
     <h2 class="error" hidden={response}>No response from server</h2>
     <p>Players: </p>
     {#each players as p}
-      <div>{p}</div>
+      <h3>{p.name}</h3>
     {/each}
     <div hidden={players.length < 1}>
       <button on:click={startGame}>Start Game</button>
@@ -80,7 +78,7 @@
     <h2>Waiting for player responses</h2>
     <!-- status of players responses -->
     {#each players as player}
-      <h3>{player.name} {player.score} {player.answer} </h3>
+      <h3>{player.name} {!!player.answer} </h3>
     {/each}
     <button on:click={endQuestion}>End Question</button>
   </div>
