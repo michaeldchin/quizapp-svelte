@@ -57,8 +57,11 @@ class Event {
   static playerAnswersUpdate(players) {
     return JSON.stringify({event: 'playerAnswersUpdate', players})
   }
-  static hostEndedQuestion() {
-    return JSON.stringify({event: 'hostEndedQuestion'})
+  static hostEndedQuestion(players) {
+    return JSON.stringify({event: 'hostEndedQuestion', players})
+  }
+  static hostGradedAnswers(players) {
+    return JSON.stringify({event: 'hostGradedAnswers', players})
   }
 }
 
@@ -99,7 +102,13 @@ wss.on('connection', (ws, req) => {
       }
       if (resp.event === 'hostEndedQuestion') {
         const game = Controller.getGame(gameId)
-        game.updatePlayersOnly(Event.hostEndedQuestion())
+        game.updatePlayersOnly(Event.hostEndedQuestion(game.listPlayersFull()))
+      }
+      if (resp.event === 'hostGradedAnswers') {
+        const game = Controller.getGame(gameId)
+        game.scoreAnswers(resp.players)
+        game.updatePlayersOnly(Event.hostGradedAnswers(game.listPlayersFull()))
+        game.updateHostOnly(Event.hostGradedAnswers(game.listPlayersFull()))
       }
     })
   }
@@ -244,22 +253,28 @@ class Game {
     }
     if (!playerAlreadyExists) {
       this.players.set(player.id, player)
-      this.updatePlayers()
+      this.updatePlayersJoinStageONLY()
       return true
     }
   }
 
   removePlayer(playerId) {
     this.players.delete(playerId)
-    this.updatePlayers()
+    this.updatePlayersJoinStageONLY()
   }
 
   getPlayer(playerId) {
     return this.players.get(playerId)
   }
 
+  scoreAnswers(players){
+    players.forEach(p => {
+      this.getPlayer(p.id).score = p.score + p.scoreDelta
+    })
+  }
 
-  updatePlayers() {
+  // TODO: Dont make this join based
+  updatePlayersJoinStageONLY() {
     const strResponse = Event.playerJoin(this.listPlayersFull())
     this.hostConnection.send(strResponse)
     this.players.forEach((p) => {
@@ -306,6 +321,7 @@ class Player {
       id: this.id,
       name: this.name,
       score: this.score,
+      scoreDelta: 0,
       answer: this.answer,
     }
   }

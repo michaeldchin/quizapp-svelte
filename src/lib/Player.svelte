@@ -8,6 +8,7 @@
     questionTrueFalse: 'questionTrueFalse',
     questionOpenEnded: 'questionOpenEnded',
     hostEndedQuestion: 'hostEndedQuestion',
+    hostGradedAnswers: 'hostGradedAnswers'
   }
   const baseURL = import.meta.env.VITE_BASEURL
 
@@ -43,9 +44,12 @@
         answer = '' // new question
         state = PLAYERSTATE.questionOpenEnded
       }
-
       if (resp.event === PLAYERSTATE.hostEndedQuestion) {
         state = PLAYERSTATE.hostEndedQuestion
+      }
+      if (resp.event === PLAYERSTATE.hostGradedAnswers) {
+        fellowPlayers = resp.players
+        state = PLAYERSTATE.hostGradedAnswers
       }
     }
   }
@@ -109,12 +113,21 @@
   </div>
 
   <div id="questionOpenEnded" hidden={state !== PLAYERSTATE.questionOpenEnded}>
-    <input bind:value={answer} placeholder="Enter Answer" />
+    <input bind:value={answer} placeholder="Enter Answer" maxlength="255"/>
   </div>
 
   <div id="hostEndedQuestion" hidden={state !== PLAYERSTATE.hostEndedQuestion}>
-    <h2>Your Answer</h2>
-    <h3>{answer}</h3>
+    {#each fellowPlayers as player}
+      <h3>{player.name}: </h3>
+      <h3>{player.answer}</h3>
+    {/each}
+  </div>
+
+  <div hidden={state !== PLAYERSTATE.hostGradedAnswers}>
+    {#each fellowPlayers as player}
+      <h3>{player.name}: </h3>
+      <h3>{player.score}</h3>
+    {/each}
   </div>
 </main>
 
