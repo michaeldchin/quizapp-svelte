@@ -32,6 +32,9 @@
     if (resp.event === 'hostGradedAnswers') {
       players = resp.players 
     }
+    if (resp.event === 'gameAlreadyExists') {
+      response = 'Someone is already hosting a game! '
+    }
   }
 
   ws.onerror = err => {

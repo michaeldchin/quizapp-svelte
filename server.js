@@ -34,7 +34,10 @@ class Event {
     return JSON.stringify({role: Roles.HOST, event: 'newGame', gameId: newGameId})
   }
   static gameAlreadyExists() {
-    return 'Game already exists'
+    return JSON.stringify({event: 'gameAlreadyExists'})
+  }
+  static gameDoesntExist() {
+    return 'There is no host, try again when someone is hosting a game'
   }
   static hostLeft() {
     return JSON.stringify({event: 'hostLeftGameClose'})
@@ -168,7 +171,12 @@ const handleGameConnect = (ws, req) => {
     }
   }
   if (queryParams.player === Roles.PLAYER) {
-    const playerId = Controller.playerJoin(queryParams.gameId, ws)
+    //if no game return response
+    if (!Controller.getGame(queryParams.gameId)) {
+      ws.send(Event.gameDoesntExist())
+      return {}
+    }
+    const playerId = Controller.playerJoin(queryParams.gameId, queryParams.playerName, ws)
     return {role: Roles.PLAYER, gameId: queryParams.gameId, playerId}
   }
   if (queryParams.player === Roles.VIEWER) {
@@ -212,12 +220,12 @@ class Controller {
     this.games.delete(gameId)
   }
 
-  static playerJoin(gameId, ws) {
+  static playerJoin(gameId, playerName, ws) {
     if (!this.games.has(gameId)) {
       throw new Error(`playerJoin() called with gameId: ${gameId} that does not exist.`) 
     }
     const game = this.getGame(gameId)
-    const newPlayer = new Player('SomeDude', ws)
+    const newPlayer = new Player(playerName, ws)
     game.addPlayer(newPlayer)
     // update all players that this player has joined game
     return newPlayer.id

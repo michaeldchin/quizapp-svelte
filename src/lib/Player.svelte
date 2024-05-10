@@ -11,15 +11,22 @@
     hostGradedAnswers: 'hostGradedAnswers'
   }
   const baseURL = import.meta.env.VITE_BASEURL
+  const randomDefaultNames = ['Tim', 'p','player', 'SomeDude', 'whosaidmyname', 'Micoolman', 'Unknown', 'nuciiknab','MichaelAndJello']
 
   let gameId = 'aaaa'
+  let playerName = randomDefaultNames[Math.floor(Math.random() * randomDefaultNames.length)]
   let fellowPlayers = []
   let answer = ''
   let state = PLAYERSTATE.prompt
+  let warning
   let ws = undefined;
   const connectToGame = () => {
-    ws = new WebSocket(`${baseURL}/?player=player&gameId=${gameId}`);
+    ws = new WebSocket(`${baseURL}/?player=player&gameId=${gameId}&playerName=${playerName}`);
     ws.onmessage = (msg) => {
+      if (msg.data === 'There is no host, try again when someone is hosting a game') {
+        warning = msg.data
+        return
+      }
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
       console.log(resp)
@@ -72,10 +79,13 @@
 <main>
   <div id="join-prompt" hidden={state !== 'prompt'}>
     <div class="input-container">
-      <input bind:value={gameId} placeholder="Enter game ID" />
+      <!-- <h3>Game Id (Hardcoded you can't change this):</h3>
+      <input bind:value={gameId} disabled placeholder="Enter game ID" /> -->
+      
+      <h3>Player Name:</h3><input bind:value={playerName} placeholder="Enter PlayerName" />
     </div>
     <button disabled={!gameId} on:click={connectToGame}>Join Game</button>
-    <p class="input-warning"></p>
+    <p class="input-warning">{warning}</p>
   </div>
 
   <div id="waiting" hidden={state !== 'waiting'}>
