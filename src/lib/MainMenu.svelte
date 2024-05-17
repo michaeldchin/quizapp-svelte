@@ -5,7 +5,6 @@
 
   const hostGame = () => {gameState = Constants.HOST}
   const joinGame = () => {gameState = Constants.PLAYER}
-  const viewGame = () => {gameState = Constants.VIEWER}
 </script>
 
 <div>
@@ -14,7 +13,6 @@
 
 <div class="menu">
   <button class="menu-items join-game" on:click={joinGame}> Join a game </button>
-  <button class="menu-items join-game" on:click={viewGame}> View a game </button>
   <button class="menu-items join-game" on:click={hostGame}> Host a new game </button>  
 </div>
 
