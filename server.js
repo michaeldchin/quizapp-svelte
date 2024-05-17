@@ -1,27 +1,10 @@
 import { WebSocketServer } from 'ws'
 import queryString from 'querystring'
 import { v4 as uuidv4 } from 'uuid';
-import { createServer } from 'https'
-import { readFileSync } from 'fs';
 
 let wss
-let server
 const PORT = 8081
-const RUNNING_LOCALLY = process.argv[2] === 'localhost'
-if (RUNNING_LOCALLY) { // running locally requires https server with certs
-  const CERTPATH = './.cert/cert.pem'
-  const CERTKEYPATH = './.cert/key.pem'
-
-  server = createServer({
-    cert: readFileSync(CERTPATH),
-    key: readFileSync(CERTKEYPATH)
-  })
-  wss = new WebSocketServer({ server });
-
-}
-else { // in production we rely on a nginx proxy to take care of SSL
-  wss = new WebSocketServer({ port: PORT });
-}
+wss = new WebSocketServer({ port: PORT });
 
 class Roles {
   static HOST = 'host'
@@ -142,10 +125,6 @@ wss.on('connection', (ws, req) => {
   })
 
 })
-
-if (RUNNING_LOCALLY) {
-  server.listen(PORT);
-}
 
 const logConnectionInfo = (req) => {
   const ip = req.socket.remoteAddress;

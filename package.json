@@ -17,8 +17,7 @@
     "nodemon": "^3.1.0",
     "svelte": "^4.2.12",
     "typescript": "^5.4.5",
-    "vite": "^5.2.0",
-    "vite-plugin-mkcert": "^1.17.5"
+    "vite": "^5.2.0"
   },
   "dependencies": {
     "uuid": "^9.0.1",
