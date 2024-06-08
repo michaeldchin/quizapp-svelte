@@ -85,7 +85,7 @@
       <h3>Player Name:</h3><input bind:value={playerName} placeholder="Enter PlayerName" />
     </div>
     <button disabled={!gameId} on:click={connectToGame}>Join Game</button>
-    <p class="input-warning">{warning}</p>
+    <p class="input-warning" hidden={!warning}>{warning}</p>
   </div>
 
   <div id="waiting" hidden={state !== 'waiting'}>

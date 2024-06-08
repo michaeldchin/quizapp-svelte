@@ -1,4 +1,6 @@
 <script>
+    import Scorecard from "./Scorecard.svelte";
+
   const HOSTSTATE = {
     newGame: 'newGame',
     waiting: 'waiting',
@@ -97,24 +99,11 @@
 
   <div hidden={gameState !== HOSTSTATE.hostEndedQuestion}>
     <h2>Player answers</h2>
+    <div class="playerCards">
     {#each players as player}
-      <div class="playerAnswerScoring">
-        <div class="nameAnswer">
-          <div class="name">
-            <h3>{player.name}</h3>
-          </div>
-          <div class="answer">
-            <h4 class="answerLabel">Answer:</h4><h4>{player.answer}</h4>
-          </div>
-        </div>
-        <div class="scoringSection">
-          <h3>{player.scoreDelta}</h3>
-          <button class="scoreButton" on:click={() => player.scoreDelta--}>-1</button>
-          <button class="scoreButton" on:click={() => player.scoreDelta++}>+1</button>
-          <h3>Total Score: {player.score}</h3>
-        </div>
-      </div>
+      <Scorecard player={player}></Scorecard>
     {/each}
+    </div>
     <button on:click={() => gradeAnswers(players)}>Submit Scores</button>
   </div>
 
@@ -143,32 +132,10 @@
   .errorState {
     color: red;
   }
-  .scoreButton {
-    margin: .1rem;
-    padding-inline: .5rem;
-    
-  }
-  .playerAnswerScoring {
+  .playerCards {
     display: flex;
-  }
-  .nameAnswer {
-    width: 50%;
-    display: flex;
-  }
-  .name {
-    width: 50%;
-    display: flex;
-  }
-  .answer {
-    width: 50%;
-    display: flex;
-  }
-  .answerLabel {
-    color: gray;
-  }
-  .scoringSection {
-    margin-left: auto;
-    display: flex;
+    gap: 10px;
+    justify-content: center;
   }
   main {
     width: 50vw;
