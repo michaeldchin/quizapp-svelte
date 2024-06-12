@@ -1,6 +1,18 @@
 <script>
   import Scorecard from "./Scorecard.svelte";
   import HostWaitingForResponses from "./HostWaitingForResponses.svelte";
+  import { fly } from 'svelte/transition';
+
+  const flyInParams = {
+    delay: 200,
+    duration: 200,
+    y: -1000
+  }
+  const flyOutParams = {
+    duration: 200,
+    y: 1000
+  }
+
 
   const HOSTSTATE = {
     newGame: 'newGame',
@@ -67,7 +79,8 @@
 </script>
 
 <main>
-  <div hidden={gameState !== 'waiting'}>
+  {#if gameState === 'waiting'}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h2 class="waitingPlayers" >Waiting for players to join...</h2>
     <h2 class="error" hidden={response}>No response from server</h2>
     {#each players as p}
@@ -78,7 +91,8 @@
     </div>
   </div>
 
-  <div hidden={gameState !== HOSTSTATE.hostStartedGame}>
+  {:else if gameState === HOSTSTATE.hostStartedGame}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h2>Choose question type</h2>
     <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
     <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
@@ -86,12 +100,14 @@
     <!-- <button>Open Ended</button> -->
   </div>
 
-  <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
+  {:else if gameState === HOSTSTATE.questionSentWaitingForPlayers}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <HostWaitingForResponses players={players}></HostWaitingForResponses>
     <button on:click={endQuestion}>End Question</button>
   </div>
 
-  <div hidden={gameState !== HOSTSTATE.hostEndedQuestion}>
+  {:else if gameState === HOSTSTATE.hostEndedQuestion}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h2>Player answers</h2>
     <div class="playerCards">
     {#each players as player}
@@ -101,7 +117,8 @@
     <button on:click={() => gradeAnswers(players)}>Submit Scores</button>
   </div>
 
-  <div hidden={gameState !== HOSTSTATE.hostGradedAnswers}>
+  {:else if gameState === HOSTSTATE.hostGradedAnswers}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     {#each players as player}
       <h4>{player.name} ({player.score} pts)</h4>
     {/each}
@@ -112,10 +129,12 @@
     <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
   </div>
 
-  <div hidden={gameState !== HOSTSTATE.errorWithGameServer}>
+  {:else if gameState === HOSTSTATE.errorWithGameServer}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h1 class="errorState">ERROR</h1>
     <h3 class="errorState">Unable to connect to gameserver</h3>
   </div>
+  {/if}
 </main>
 
 <style>

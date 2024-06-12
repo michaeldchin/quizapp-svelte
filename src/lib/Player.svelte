@@ -1,4 +1,16 @@
 <script>
+  import { fly } from 'svelte/transition';
+
+  const flyInParams = {
+    delay: 200,
+    duration: 200,
+    y: -1000
+  }
+  const flyOutParams = {
+    duration: 200,
+    y: 1000
+  }
+
  const PLAYERSTATE = {
     prompt: 'prompt',
     waiting: 'waiting',
@@ -78,7 +90,8 @@
 </script>
 
 <main>
-  <div id="join-prompt" hidden={state !== 'prompt'}>
+  {#if state === 'prompt'}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <div class="input-container">
       <!-- <h3>Game Id (Hardcoded you can't change this):</h3>
       <input bind:value={gameId} disabled placeholder="Enter game ID" /> -->
@@ -89,7 +102,8 @@
     <p class="input-warning" hidden={!warning}>{warning}</p>
   </div>
 
-  <div id="waiting" hidden={state !== 'waiting'}>
+  {:else if state === 'waiting'}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <p>Waiting for game to start</p>
     <p>Fellow players:</p>
     {#each fellowPlayers as player}
@@ -97,15 +111,18 @@
     {/each}
   </div>
 
-  <div id="gameClosedByHost" hidden={state !== PLAYERSTATE.hostLeftGameClose}>
+  {:else if state === PLAYERSTATE.hostLeftGameClose}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <p>Game ended by host, refresh to get back to main menu</p>
   </div>
 
-  <div id="hostStartedGame" hidden={state !== PLAYERSTATE.hostStartedGame}>
+  {:else if state === PLAYERSTATE.hostStartedGame}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <p>Game started. Waiting for host to send question</p>
   </div>
 
-  <div id="questionMultipleChoice" hidden={state !== PLAYERSTATE.questionMultipleChoice}>
+  {:else if state === PLAYERSTATE.questionMultipleChoice}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     {#each ['A','B','C','D'] as option}
       <button id={option} 
               class:selectedChoice="{option === answer}"
@@ -114,7 +131,8 @@
     {/each}
   </div>
 
-  <div id="questionTrueFalse" hidden={state !== PLAYERSTATE.questionTrueFalse}>
+  {:else if state === PLAYERSTATE.questionTrueFalse}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     {#each ['True','False'] as option}
       <button id={option} 
               class:selectedChoice="{option === answer}"
@@ -123,11 +141,13 @@
     {/each}
   </div>
 
-  <div id="questionOpenEnded" hidden={state !== PLAYERSTATE.questionOpenEnded}>
+  {:else if state === PLAYERSTATE.questionOpenEnded}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <input bind:value={answer} placeholder="Enter Answer" maxlength="255"/>
   </div>
 
-  <div id="hostEndedQuestion" hidden={state !== PLAYERSTATE.hostEndedQuestion}>
+  {:else if state === PLAYERSTATE.hostEndedQuestion}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h1>Answers</h1>
     {#each fellowPlayers as player}
     <div class="boxborder">
@@ -137,11 +157,13 @@
     {/each}
   </div>
 
-  <div hidden={state !== PLAYERSTATE.hostGradedAnswers}>
+  {:else if state === PLAYERSTATE.hostGradedAnswers}
+  <div in:fly={flyInParams} out:fly={flyOutParams}>
     {#each fellowPlayers as player}
       <div>{player.name} ({player.score} pts)</div>
     {/each}
   </div>
+  {/if}
 </main>
 
 <style>
