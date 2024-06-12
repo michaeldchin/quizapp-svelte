@@ -3,7 +3,7 @@
 </script>
 
 <main>
-    <div class="playerAnswerScoring">
+    <div class="boxborder">
         <div class="nameAnswer">
             <div class="name">
             <h3>{player.name}</h3>
@@ -22,7 +22,4 @@
 </main>
 
 <style>
-    .playerAnswerScoring {
-        border: solid 2px;
-    }
 </style>

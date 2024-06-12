@@ -109,8 +109,7 @@
 
   <div hidden={gameState !== HOSTSTATE.hostGradedAnswers}>
     {#each players as player}
-      <h3>{player.name}</h3>
-      <h3>{player.score}</h3>
+      <h4>{player.name} ({player.score} pts)</h4>
     {/each}
     
     <h3>Next Question</h3>

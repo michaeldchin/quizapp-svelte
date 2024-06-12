@@ -52,6 +52,7 @@
         state = PLAYERSTATE.questionOpenEnded
       }
       if (resp.event === PLAYERSTATE.hostEndedQuestion) {
+        fellowPlayers = resp.players
         state = PLAYERSTATE.hostEndedQuestion
       }
       if (resp.event === PLAYERSTATE.hostGradedAnswers) {
@@ -127,16 +128,18 @@
   </div>
 
   <div id="hostEndedQuestion" hidden={state !== PLAYERSTATE.hostEndedQuestion}>
+    <h1>Answers</h1>
     {#each fellowPlayers as player}
-      <h3>{player.name}: </h3>
-      <h3>{player.answer}</h3>
+    <div class="boxborder">
+      {player.name} ({player.score} pts)
+      <h4>{player.answer}</h4>
+    </div>
     {/each}
   </div>
 
   <div hidden={state !== PLAYERSTATE.hostGradedAnswers}>
     {#each fellowPlayers as player}
-      <h3>{player.name}: </h3>
-      <h3>{player.score}</h3>
+      <div>{player.name} ({player.score} pts)</div>
     {/each}
   </div>
 </main>
