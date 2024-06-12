@@ -257,6 +257,7 @@ class Game {
   scoreAnswers(players){
     players.forEach(p => {
       this.getPlayer(p.id).score = p.score + p.scoreDelta
+      this.getPlayer(p.id).answer = undefined // clear the answer, but i dont like this, i feel like it should happen somewhere else
     })
   }
 

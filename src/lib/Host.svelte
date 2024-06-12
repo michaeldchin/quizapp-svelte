@@ -1,5 +1,6 @@
 <script>
-    import Scorecard from "./Scorecard.svelte";
+  import Scorecard from "./Scorecard.svelte";
+  import HostWaitingForResponses from "./HostWaitingForResponses.svelte";
 
   const HOSTSTATE = {
     newGame: 'newGame',
@@ -61,7 +62,6 @@
 
   const gradeAnswers = (players) => {
     gameState = HOSTSTATE.hostGradedAnswers
-    players.forEach(p => p.answer = null)
     ws.send(JSON.stringify({event: gameState, gameId, players}))
   }
 </script>
@@ -89,11 +89,7 @@
   </div>
 
   <div hidden={gameState !== HOSTSTATE.questionSentWaitingForPlayers}>
-    <h2>Waiting for player responses</h2>
-    <!-- status of players responses -->
-    {#each players as player}
-      <h3>{player.name} {!!player.answer} </h3>
-    {/each}
+    <HostWaitingForResponses players={players}></HostWaitingForResponses>
     <button on:click={endQuestion}>End Question</button>
   </div>
 
