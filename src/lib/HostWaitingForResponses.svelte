@@ -11,7 +11,7 @@
     {#if !player.answer}
       <div transition:fade>❌</div>
     {:else}
-      <div in:fly={{delay: 400, y: '-800', duration: 2500}}>✅</div>
+      <div in:fly={{delay: 400, x: '800', duration: 2500}}>✅</div>
     {/if}
   </div>
   {/each}
