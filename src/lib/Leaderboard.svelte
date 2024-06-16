@@ -1,6 +1,5 @@
 <script>
   export let players;
-  players = [...players].sort((a, b) => b.score - a.score);
 </script>
 
 

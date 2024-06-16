@@ -30,10 +30,6 @@
   .join-game {
     width: 100%;
   }
-  .secondary-buttons {
-    margin-top: .5em;
-    width: 45%;
-  }
 
   .logo {
     max-width: min(550px, 80vw);

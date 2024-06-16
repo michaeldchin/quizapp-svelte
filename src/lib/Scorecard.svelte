@@ -33,7 +33,6 @@
             <h3 class="scoreLabel" style="background-color: {scoreLabelColor};">{player.scoreDelta}</h3> 
             <button class="scoreButton" on:click={() => adjustScore(-1)}>-1</button>
             <button class="scoreButton" on:click={() => adjustScore(1)}>+1</button>
-            <button class="scoreButton" on:click={() => adjustScore(5)}>+5</button>
         </div>
     </div>
 </main>
