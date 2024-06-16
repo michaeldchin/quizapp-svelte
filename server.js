@@ -155,7 +155,17 @@ const handleGameConnect = (ws, req) => {
       ws.send(Event.gameDoesntExist())
       return {}
     }
-    const playerId = Controller.playerJoin(queryParams.gameId, queryParams.playerName, ws)
+    let playerId
+    try {
+        playerId = Controller.playerJoin(queryParams.gameId, queryParams.playerName, ws)
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        ws.send(e.message)
+        return {}
+      } else {
+        throw e
+      }
+    }
     return {role: Roles.PLAYER, gameId: queryParams.gameId, playerId}
   }
   if (queryParams.player === Roles.VIEWER) {
@@ -205,7 +215,9 @@ class Controller {
     }
     const game = this.getGame(gameId)
     const newPlayer = new Player(playerName, ws)
-    game.addPlayer(newPlayer)
+    if (!game.addPlayer(newPlayer)) {
+      throw new ValidationError(`Cannot join game. player: ${playerName} already exists.`)
+    }
     // update all players that this player has joined game
     return newPlayer.id
   }
@@ -234,12 +246,17 @@ class Game {
   }
 
   addPlayer(player) {
-    const playerAlreadyExists = this.players.has(player.id)
+    console.log(`Adding player: ${player.id} with name: ${player.name}`)
+    const playerAlreadyExists = this.players.has(player.id) ||
+      Array.from(this.players.values()).some(p => p.name === player.name)
+
     if (playerAlreadyExists) {
+      console.log(`Player already exists`)
       return false
     }
     if (!playerAlreadyExists) {
       this.players.set(player.id, player)
+      console.log(`Player added successfully`)
       this.updatePlayersJoinStageONLY()
       return true
     }

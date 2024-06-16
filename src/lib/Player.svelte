@@ -39,6 +39,10 @@
         warning = msg.data
         return
       }
+      if (msg.data.startsWith('Cannot join game')) {
+        warning = msg.data
+        return
+      }
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
       console.log(resp)
