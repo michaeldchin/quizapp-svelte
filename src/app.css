@@ -71,4 +71,5 @@ button:focus-visible {
 
 .boxborder {
   border: solid 2px;
+  border-radius: 0.5rem;
 }

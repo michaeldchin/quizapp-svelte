@@ -5,7 +5,7 @@
 
 
 <main>
-  <div class="leaderboard-container">
+  <div class="leaderboard-container" style="display: flex; justify-content: center;">
     <table class="leaderboard">
       <thead>
         <tr>
@@ -34,6 +34,8 @@
       padding: 1rem;
       margin: auto;
       width: 60%;
+      display: flex;
+      justify-content: center;
     }
     
     .leaderboard {
