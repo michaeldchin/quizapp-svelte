@@ -1,5 +1,6 @@
 <script>
   import Scorecard from "./Scorecard.svelte";
+  import Leaderboard from "./Leaderboard.svelte";
   import HostWaitingForResponses from "./HostWaitingForResponses.svelte";
   import { fly } from 'svelte/transition';
 
@@ -103,7 +104,7 @@
   {:else if gameState === HOSTSTATE.questionSentWaitingForPlayers}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
     <HostWaitingForResponses players={players}></HostWaitingForResponses>
-    <button on:click={endQuestion}>End Question</button>
+    <button on:click={endQuestion} style="margin-top: 1em;">End Question</button>
   </div>
 
   {:else if gameState === HOSTSTATE.hostEndedQuestion}
@@ -114,16 +115,14 @@
       <Scorecard player={player}></Scorecard>
     {/each}
     </div>
-    <button on:click={() => gradeAnswers(players)}>Submit Scores</button>
+    <button on:click={() => gradeAnswers(players)} style="margin-top: 1em;">Submit Scores</button>
   </div>
 
   {:else if gameState === HOSTSTATE.hostGradedAnswers}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
-    {#each players as player}
-      <h4>{player.name} ({player.score} pts)</h4>
-    {/each}
+    <Leaderboard players={players}></Leaderboard>
     
-    <h3>Next Question</h3>
+    <h3 style="margin-top: 1em;">Next Question</h3>
     <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
     <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
     <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>

@@ -1,5 +1,5 @@
 <script>
-  import logo from "../assets/triviaapp-mc.png";
+  import logo from "../assets/triviaapp-mc.svg";
   import * as Constants from "./Constants";
   export let gameState;
 
@@ -36,6 +36,6 @@
   }
 
   .logo {
-    width: 100%;
+    max-width: min(550px, 80vw);
   }
 </style>
