@@ -37,6 +37,11 @@
   let ws = undefined;
   const connectToGame = () => {
     ws = new WebSocket(`${baseURL}/?player=player&gameId=${gameId}&playerName=${playerName}`);
+    // keep alive
+    setInterval(() => {
+      ws.send(JSON.stringify({event: 'keepAlive'}))
+    }, 5000)
+
     ws.onmessage = (msg) => {
       if (msg.data === 'There is no host, try again when someone is hosting a game') {
         warning = msg.data
@@ -96,6 +101,9 @@
   const selectChoice = (c) => {
     answer = c
     ws.send(JSON.stringify({event: 'playerAnswer', gameId, answer}))
+  }
+  const keepAlive = () => {
+    ws.send(JSON.stringify({event: "keepAlive"}))
   }
 </script>
 

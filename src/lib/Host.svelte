@@ -28,6 +28,10 @@
   let gameId
   const baseURL = import.meta.env.VITE_BASEURL
   const ws = new WebSocket(`${baseURL}/?player=host`); //&gameId=${gameId}
+  // keep alive
+  setInterval(() => {
+    ws.send(JSON.stringify({event: 'keepAlive'}))
+  }, 5000)
 
   let gameState = HOSTSTATE.waiting
   export let response = null
