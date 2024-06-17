@@ -70,13 +70,13 @@ wss.on('connection', (ws, req) => {
   // Host Events
   if (role === Roles.HOST) {
     ws.on('message', (message) => {
-      console.log(JSON.parse(message))
       const resp = JSON.parse(message)
       if (resp.event ==='keepAlive') {
         // in prod the idle wss connection is killed after 60 seconds, so we take keepalive pings
         // https://stackoverflow.com/questions/29579208/why-does-my-websocket-close-after-a-few-minutes
         return
       }
+      console.log(JSON.parse(message))
       if (resp.event === 'hostStartedGame') {
         Controller.startGame(gameId)
       }
