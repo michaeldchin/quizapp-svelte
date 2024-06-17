@@ -100,7 +100,8 @@
       <!-- <h3>Game Id (Hardcoded you can't change this):</h3>
       <input bind:value={gameId} disabled placeholder="Enter game ID" /> -->
       
-      <h3>Player Name:</h3><input bind:value={playerName} placeholder="Enter PlayerName" />
+      <h3>Player Name:</h3>
+      <input maxlength="60" bind:value={playerName} placeholder="Enter PlayerName" />
     </div>
     <button disabled={!gameId} on:click={connectToGame}>Join Game</button>
     <p class="input-warning" hidden={!warning}>{warning}</p>
