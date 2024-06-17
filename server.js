@@ -28,6 +28,9 @@ class Event {
   static playerJoin(playerList) {
     return JSON.stringify({event: 'playerJoin', players: playerList})
   }
+  static notifyPlayerOfTheirId(playerId) {
+    return JSON.stringify({event: 'yourPlayerId', playerId})
+  }
   static hostStartedGame() {
     return JSON.stringify({event: 'hostStartedGame'})
   }
@@ -158,6 +161,8 @@ const handleGameConnect = (ws, req) => {
     let playerId
     try {
         playerId = Controller.playerJoin(queryParams.gameId, queryParams.playerName, ws)
+        // let the player know their id
+        ws.send(Event.notifyPlayerOfTheirId(playerId))
     } catch (e) {
       if (e instanceof ValidationError) {
         ws.send(e.message)

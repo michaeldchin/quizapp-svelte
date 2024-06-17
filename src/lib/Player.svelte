@@ -25,6 +25,9 @@
   const baseURL = import.meta.env.VITE_BASEURL
   const randomDefaultNames = ['Tim', 'p','player', 'SomeDude', 'whosaidmyname', 'Micoolman', 'Unknown', 'nuciiknab','MichaelAndJello']
 
+  let playerId
+  $: currentPlayerInfo = fellowPlayers.find(player => player.id === playerId)
+
   let gameId = 'aaaa'
   let playerName = randomDefaultNames[Math.floor(Math.random() * randomDefaultNames.length)]
   let fellowPlayers = []
@@ -46,6 +49,9 @@
       state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
       console.log(resp)
+      if (resp.event === 'yourPlayerId') {
+        playerId = resp.playerId
+      }
       if (resp.event === 'playerJoin') {
         fellowPlayers = resp.players
       }
@@ -169,6 +175,12 @@
     {/each}
   </div>
   {/if}
+
+  <div class="playerFooter" style="position: fixed; bottom: 10px; left: 10px;">
+    {#if currentPlayerInfo}
+      <div>{currentPlayerInfo.name} ({currentPlayerInfo.score} pts)</div>
+    {/if}
+  </div>
 </main>
 
 <style>
