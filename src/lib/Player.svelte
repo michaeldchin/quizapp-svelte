@@ -134,7 +134,7 @@
 
   {:else if state === PLAYERSTATE.questionMultipleChoice}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
-    {#each ['A','B','C','D'] as option}
+    {#each ['A','B','C','D','E','F','G','H'] as option}
       <button id={option} 
               class:selectedChoice="{option === answer}"
               class="choices"
