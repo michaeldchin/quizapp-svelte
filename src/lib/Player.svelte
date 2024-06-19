@@ -51,10 +51,10 @@
         warning = msg.data
         return
       }
-      state = PLAYERSTATE.waiting
       const resp = JSON.parse(msg.data)
       console.log(resp)
       if (resp.event === 'yourPlayerId') {
+        state = PLAYERSTATE.waiting
         playerId = resp.playerId
       }
       if (resp.event === 'playerJoin') {
@@ -66,17 +66,12 @@
       if (resp.event === PLAYERSTATE.hostStartedGame) {
         state = PLAYERSTATE.hostStartedGame
       }
-      if (resp.event === PLAYERSTATE.questionMultipleChoice) {
+      if ([PLAYERSTATE.questionMultipleChoice, 
+        PLAYERSTATE.questionTrueFalse, 
+        PLAYERSTATE.questionOpenEnded].includes(resp.event)) {
         answer = '' // new question
-        state = PLAYERSTATE.questionMultipleChoice
-      }
-      if (resp.event === PLAYERSTATE.questionTrueFalse) {
-        answer = '' // new question
-        state = PLAYERSTATE.questionTrueFalse
-      }
-      if (resp.event === PLAYERSTATE.questionOpenEnded) {
-        answer = '' // new question
-        state = PLAYERSTATE.questionOpenEnded
+        triggerTransition()
+        state = resp.event
       }
       if (resp.event === PLAYERSTATE.hostEndedQuestion) {
         fellowPlayers = resp.players
@@ -102,8 +97,10 @@
     answer = c
     ws.send(JSON.stringify({event: 'playerAnswer', gameId, answer}))
   }
-  const keepAlive = () => {
-    ws.send(JSON.stringify({event: "keepAlive"}))
+
+  let unique = {}
+  function triggerTransition() {
+    unique = {} // every {} is unique, {} === {} evaluates to false
   }
 </script>
 
@@ -140,30 +137,40 @@
     <p>Game started. Waiting for host to send question</p>
   </div>
 
-  {:else if state === PLAYERSTATE.questionMultipleChoice}
+  {:else if [
+    PLAYERSTATE.questionMultipleChoice,
+    PLAYERSTATE.questionTrueFalse,
+    PLAYERSTATE.questionOpenEnded
+  ].includes(state)}
+  {#key unique}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
-    {#each ['A','B','C','D','E','F','G','H'] as option}
-      <button id={option} 
-              class:selectedChoice="{option === answer}"
-              class="choices"
-              on:click={() => selectChoice(option)}>{option}</button>
-    {/each}
+    {#if state === PLAYERSTATE.questionMultipleChoice}
+      {#each ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as option}
+        <button
+          id={option}
+          class:selectedChoice="{option === answer}"
+          class="choices"
+          on:click={() => selectChoice(option)}
+        >
+          {option}
+        </button>
+      {/each}
+    {:else if state === PLAYERSTATE.questionTrueFalse}
+      {#each ['True', 'False'] as option}
+        <button
+          id={option}
+          class:selectedChoice="{option === answer}"
+          class="choices"
+          on:click={() => selectChoice(option)}
+        >
+          {option}
+        </button>
+      {/each}
+    {:else if state === PLAYERSTATE.questionOpenEnded}
+      <input bind:value={answer} placeholder="Enter Answer" maxlength="255" />
+    {/if}
   </div>
-
-  {:else if state === PLAYERSTATE.questionTrueFalse}
-  <div in:fly={flyInParams} out:fly={flyOutParams}>
-    {#each ['True','False'] as option}
-      <button id={option} 
-              class:selectedChoice="{option === answer}"
-              class="choices"
-              on:click={() => selectChoice(option)}>{option}</button>
-    {/each}
-  </div>
-
-  {:else if state === PLAYERSTATE.questionOpenEnded}
-  <div in:fly={flyInParams} out:fly={flyOutParams}>
-    <input bind:value={answer} placeholder="Enter Answer" maxlength="255"/>
-  </div>
+  {/key}
 
   {:else if state === PLAYERSTATE.hostEndedQuestion}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
@@ -171,7 +178,7 @@
     {#each fellowPlayers as player}
     <div class="boxborder">
       {player.name} ({player.score} pts)
-      <h4>{player.answer}</h4>
+      <h4>{player.answerStack}</h4>
     </div>
     {/each}
   </div>

@@ -68,6 +68,9 @@
   }
 
   const sendQuestion = (questionType) => {
+    if (gameState === HOSTSTATE.questionSentWaitingForPlayers) {
+      triggerTransition()
+    }
     gameState = HOSTSTATE.questionSentWaitingForPlayers
     ws.send(JSON.stringify({event: gameState, gameId, questionType}))
   }
@@ -80,6 +83,11 @@
   const gradeAnswers = (players) => {
     gameState = HOSTSTATE.hostGradedAnswers
     ws.send(JSON.stringify({event: gameState, gameId, players}))
+  }
+
+  let unique = {}
+  function triggerTransition() {
+    unique = {} // every {} is unique, {} === {} evaluates to false
   }
 </script>
 
@@ -106,14 +114,16 @@
   </div>
 
   {:else if gameState === HOSTSTATE.questionSentWaitingForPlayers}
-  <div in:fly={flyInParams} out:fly={flyOutParams}>
-    <HostWaitingForResponses players={players}></HostWaitingForResponses>
-    <button on:click={endQuestion} style="margin-top: 1em;">End Question</button>
-    <h2>Choose question type</h2>
-    <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
-    <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
-    <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
-  </div>
+    {#key unique}
+      <div in:fly={flyInParams} out:fly={flyOutParams}>
+        <HostWaitingForResponses players={players}></HostWaitingForResponses>
+        <button on:click={endQuestion} style="margin-top: 1em; font-size: 1.5em;">End Question</button>
+        <h3 style="margin-top: 1em;">Or choose another question type (for multi part questions)</h3>
+        <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
+        <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
+        <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
+      </div>
+    {/key}
 
   {:else if gameState === HOSTSTATE.hostEndedQuestion}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
