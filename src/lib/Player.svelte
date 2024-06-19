@@ -102,6 +102,16 @@
   function triggerTransition() {
     unique = {} // every {} is unique, {} === {} evaluates to false
   }
+
+  function getScoreLabelColor(player) {
+    if (player.scoreDelta < 0) {
+        return `rgba(255, 0, 0, ${Math.abs(player.scoreDelta) / 10})`;
+    } else if (player.scoreDelta > 0) {
+      return `rgba(0, 255, 0, ${Math.abs(player.scoreDelta) / 10})`;
+    } else {
+      return "transparent";
+    }
+  }
 </script>
 
 <main>
@@ -176,7 +186,7 @@
   <div in:fly={flyInParams} out:fly={flyOutParams}>
     <h1>Answers</h1>
     {#each fellowPlayers as player}
-    <div class="boxborder">
+    <div class="boxborder" style="padding: 0.5em; margin-bottom: .25em;">
       {player.name} ({player.score} pts)
       <h4>{player.answerStack}</h4>
     </div>
@@ -186,12 +196,14 @@
   {:else if state === PLAYERSTATE.hostGradedAnswers}
   <div in:fly={flyInParams} out:fly={flyOutParams}>
     {#each fellowPlayers as player}
-      <div>{player.name} ({player.score} pts)</div>
+      <div class="playerScoreResults">{player.name} ({player.score} pts) 
+        <mark style="background-color: {getScoreLabelColor(player)};">{player.scoreDelta > 0 ? '+' : ''}{player.scoreDelta}</mark>
+      </div>
     {/each}
   </div>
   {/if}
 
-  <div class="playerFooter" style="position: fixed; bottom: 10px; left: 10px;">
+  <div class="playerFooter">
     {#if currentPlayerInfo}
       <div>{currentPlayerInfo.name} ({currentPlayerInfo.score} pts)</div>
     {/if}
@@ -217,6 +229,15 @@
   .choices {
     font-size: 2rem;
     margin: 4px ;
+  }
+  .playerFooter {
+    position: fixed; 
+    font-size: 1.25rem;
+    bottom: 10px; 
+    left: 10px;
+  }
+  .playerScoreResults {
+    font-size: 1.5rem;
   }
 </style>
 

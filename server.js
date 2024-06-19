@@ -107,6 +107,7 @@ wss.on('connection', (ws, req) => {
         game.scoreAnswers(resp.players)
         game.updatePlayersOnly(Event.hostGradedAnswers(game.listPlayersFull()))
         game.updateHostOnly(Event.hostGradedAnswers(game.listPlayersFull()))
+        game.resetScoreDeltas()
       }
     })
   }
@@ -302,8 +303,15 @@ class Game {
   scoreAnswers(players){
     players.forEach(p => {
       this.getPlayer(p.id).score = p.score + p.scoreDelta
+      this.getPlayer(p.id).scoreDelta = p.scoreDelta
       this.getPlayer(p.id).answer = undefined // clear the answer, but i dont like this, i feel like it should happen somewhere else
       this.getPlayer(p.id).answerStack = [] 
+    })
+  }
+
+  resetScoreDeltas() {
+    this.players.forEach(p => {
+      this.getPlayer(p.id).scoreDelta = 0
     })
   }
 
@@ -349,6 +357,7 @@ class Player {
     this.name = name
     this.ws = ws //websocket connection
     this.score = 0
+    this.scoreDelta = 0
   }
 
   toJson() {
@@ -356,7 +365,7 @@ class Player {
       id: this.id,
       name: this.name,
       score: this.score,
-      scoreDelta: 0,
+      scoreDelta: this.scoreDelta,
       answer: this.answer,
       answerStack: this.answerStack
     }
