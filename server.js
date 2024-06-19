@@ -81,14 +81,16 @@ wss.on('connection', (ws, req) => {
         Controller.startGame(gameId)
       }
       if (resp.event === 'questionSentWaitingForPlayers') {
+        const game = Controller.getGame(gameId);
+        game.saveAnswersTostack()
         if (resp.questionType === 'multipleChoice') {
-          Controller.getGame(gameId).updatePlayersOnly(Event.questionMultipleChoice())
+          game.updatePlayersOnly(Event.questionMultipleChoice())
         }
         else if (resp.questionType === 'trueFalse') {
-          Controller.getGame(gameId).updatePlayersOnly(Event.questionTrueFalse())
+          game.updatePlayersOnly(Event.questionTrueFalse())
         }
         else if (resp.questionType === 'openEnded') {
-          Controller.getGame(gameId).updatePlayersOnly(Event.questionOpenEnded())
+          game.updatePlayersOnly(Event.questionOpenEnded())
         }
         else {
           throw new Error(`not implemented ${resp.questionType}`)
@@ -96,7 +98,9 @@ wss.on('connection', (ws, req) => {
       }
       if (resp.event === 'hostEndedQuestion') {
         const game = Controller.getGame(gameId)
+        game.saveAnswersTostack()
         game.updatePlayersOnly(Event.hostEndedQuestion(game.listPlayersFull()))
+        game.updateHostOnly(Event.hostGradedAnswers(game.listPlayersFull()))
       }
       if (resp.event === 'hostGradedAnswers') {
         const game = Controller.getGame(gameId)
@@ -285,11 +289,21 @@ class Game {
   getPlayer(playerId) {
     return this.players.get(playerId)
   }
+  
+  saveAnswersTostack() {
+    this.players.forEach((p) => {
+      console.log(p)
+      if (!this.getPlayer(p.id).answer) return
+      this.getPlayer(p.id).answerStack.push(this.getPlayer(p.id).answer)
+      this.getPlayer(p.id).answer = undefined // clear the answer, but i dont like this, i feel like it should happen somewhere else
+    })
+  }
 
   scoreAnswers(players){
     players.forEach(p => {
       this.getPlayer(p.id).score = p.score + p.scoreDelta
       this.getPlayer(p.id).answer = undefined // clear the answer, but i dont like this, i feel like it should happen somewhere else
+      this.getPlayer(p.id).answerStack = [] 
     })
   }
 
@@ -328,6 +342,7 @@ class Game {
 
 class Player {
   answer = undefined
+  answerStack = []
 
   constructor(name, ws) {
     this.id = uuidv4()
@@ -343,6 +358,7 @@ class Player {
       score: this.score,
       scoreDelta: 0,
       answer: this.answer,
+      answerStack: this.answerStack
     }
   }
 }

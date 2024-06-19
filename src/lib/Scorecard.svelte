@@ -26,7 +26,7 @@
             </p>
             </div>
             <div class="answer">
-            <h4>{player.answer}</h4>
+            <h4>{player.answerStack}</h4>
             </div>
         </div>
         <div class="scoringSection">

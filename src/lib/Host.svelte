@@ -109,6 +109,10 @@
   <div in:fly={flyInParams} out:fly={flyOutParams}>
     <HostWaitingForResponses players={players}></HostWaitingForResponses>
     <button on:click={endQuestion} style="margin-top: 1em;">End Question</button>
+    <h2>Choose question type</h2>
+    <button on:click={() => sendQuestion('multipleChoice')}>Multiple Choice</button>
+    <button on:click={() => sendQuestion('trueFalse')}>True or False</button>
+    <button on:click={() => sendQuestion('openEnded')}>Open Ended</button>
   </div>
 
   {:else if gameState === HOSTSTATE.hostEndedQuestion}
