@@ -27,7 +27,7 @@
             </div>
             <div class="answer">
                 {#each player.answerStack as answer}
-                    <p style="margin: 0; font-size: 1.25em">{answer}</p>
+                    <p style="margin: 0; font-size: 1.25em; font-weight: bold">{answer}</p>
                 {/each}
             </div>
         </div>
