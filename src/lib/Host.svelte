@@ -163,8 +163,9 @@
   }
   .playerCards {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
+    margin-bottom: 0.5em;
   }
   main {
     width: 50vw;

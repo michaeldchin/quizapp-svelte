@@ -105,7 +105,7 @@
 
   function getScoreLabelColor(player) {
     if (player.scoreDelta < 0) {
-        return `rgba(255, 0, 0, ${Math.abs(player.scoreDelta) / 10})`;
+      return `rgba(255, 0, 0, ${Math.abs(player.scoreDelta) / 10})`;
     } else if (player.scoreDelta > 0) {
       return `rgba(0, 255, 0, ${Math.abs(player.scoreDelta) / 10})`;
     } else {
