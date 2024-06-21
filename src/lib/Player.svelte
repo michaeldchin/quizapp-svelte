@@ -1,5 +1,5 @@
 <script>
-  import { fly } from 'svelte/transition';
+  import { fly, fade } from 'svelte/transition';
 
   const flyInParams = {
     delay: 200,
@@ -20,7 +20,8 @@
     questionTrueFalse: 'questionTrueFalse',
     questionOpenEnded: 'questionOpenEnded',
     hostEndedQuestion: 'hostEndedQuestion',
-    hostGradedAnswers: 'hostGradedAnswers'
+    hostGradedAnswers: 'hostGradedAnswers',
+    playerAnswersUpdate: 'playerAnswersUpdate'
   }
   const baseURL = import.meta.env.VITE_BASEURL
   const randomDefaultNames = ['Tim', 'p','player', 'SomeDude', 'whosaidmyname', 'Micoolman', 'Unknown', 'nuciiknab','MichaelAndJello']
@@ -73,6 +74,9 @@
         triggerTransition()
         state = resp.event
       }
+      if (resp.event === PLAYERSTATE.playerAnswersUpdate) {
+        fellowPlayers = resp.players
+      }
       if (resp.event === PLAYERSTATE.hostEndedQuestion) {
         fellowPlayers = resp.players
         state = PLAYERSTATE.hostEndedQuestion
@@ -83,15 +87,6 @@
       }
     }
   }
-
-  //resend answer mainly to handle openended
-  let oldAnswer = '';
-  setInterval(() => {
-    if (oldAnswer != answer) {
-      oldAnswer = answer
-      ws.send(JSON.stringify({event: 'playerAnswer', gameId, answer}))
-    }
-  },1000)
 
   const selectChoice = (c) => {
     answer = c
@@ -120,7 +115,6 @@
     <div class="input-container">
       <!-- <h3>Game Id (Hardcoded you can't change this):</h3>
       <input bind:value={gameId} disabled placeholder="Enter game ID" /> -->
-      
       <h3>Player Name:</h3>
       <input maxlength="60" bind:value={playerName} placeholder="Enter PlayerName" />
     </div>
@@ -177,7 +171,16 @@
         </button>
       {/each}
     {:else if state === PLAYERSTATE.questionOpenEnded}
+    <div class="input-container">
       <input bind:value={answer} placeholder="Enter Answer" maxlength="255" />
+    </div>
+    <button on:click={() => selectChoice(answer)} style="margin-top: .25em; font-size: 1.25em;">Submit</button>
+    {#if currentPlayerInfo.answer}
+      <p transition:fade class="submittedAnswer">Submitted: {currentPlayerInfo.answer}</p>
+    {:else}
+      <!-- invisible character to keep the transition smooth -->
+      <p class="submittedAnswer">‎</p>
+    {/if}
     {/if}
   </div>
   {/key}
@@ -225,6 +228,11 @@
   }
   .selectedChoice {
     background-color: cornflowerblue;
+  }
+  .submittedAnswer {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: gray;
   }
   .choices {
     font-size: 2rem;

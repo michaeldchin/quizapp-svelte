@@ -83,6 +83,8 @@ wss.on('connection', (ws, req) => {
       if (resp.event === 'questionSentWaitingForPlayers') {
         const game = Controller.getGame(gameId);
         game.saveAnswersTostack()
+        game.updatePlayersOnly(Event.playerAnswersUpdate(game.listPlayersFull()))
+        game.updateHostOnly(Event.playerAnswersUpdate(game.listPlayersFull()))
         if (resp.questionType === 'multipleChoice') {
           game.updatePlayersOnly(Event.questionMultipleChoice())
         }
@@ -127,6 +129,7 @@ wss.on('connection', (ws, req) => {
         const game = Controller.getGame(gameId);
         const player = game.getPlayer(playerId)
         player.answer = resp.answer
+        player.ws.send(Event.playerAnswersUpdate(game.listPlayersFull()))
         game.updateHostOnly(Event.playerAnswersUpdate(game.listPlayersFull()))
       }
     })
