@@ -37,6 +37,7 @@
                 <div class="buttonContainer">
                     <button class="scoreButton" on:click={() => adjustScore(-1)}>-1</button>
                     <button class="scoreButton" on:click={() => adjustScore(1)}>+1</button>
+                    <button class="scoreButton" on:click={() => adjustScore(10)}>+10</button>
                 </div>
             </div>
         </div>
